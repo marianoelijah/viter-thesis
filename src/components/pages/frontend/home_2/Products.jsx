@@ -6,10 +6,10 @@ const Products = () => {
     { id: 1, name: "Organic Apples", price: 5.99, category: "Fruits", image: "/apple.jpg" },
     { id: 2, name: "Fresh Carrots", price: 3.49, category: "Vegetables", image: "/carrot.jpg" },
     { id: 3, name: "Dairy Milk", price: 2.99, category: "Dairy", image: "/milk.jpg" },
-    { id: 4, name: "Whole Wheat Bread", price: 4.49, category: "Bakery", image: "/bread.jpg" },
+    { id: 4, name: "Whole Wheat", price: 4.49, category: "Grains", image: "/grains.jpg" },
   ];
 
-  const categories = ["All", "Fruits", "Vegetables", "Dairy", "Bakery"];
+  const categories = ["All", "Fruits", "Vegetables", "Dairy", "Grains"];
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -24,7 +24,7 @@ const Products = () => {
   return (
     <div className="bg-gray-100 min-h-screen p-6">
       {/* Page Title */}
-      <h1 className="text-3xl font-bold text-center mb-6">Find Fresh Produce</h1>
+      <h1 className="text-4xl font-semibold text-center mb-6">Categories</h1>
 
       {/* Search & Filter Section */}
       <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-md shadow-md mb-6">
@@ -55,7 +55,7 @@ const Products = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
-            <div key={product.id} className="bg-white p-4 rounded-md shadow-md hover:scale-105 transition">
+            <div key={product.id} className="bg-gray-300 p-4 rounded-md shadow-md hover:scale-105 transition">
               <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-md" />
               <h3 className="mt-2 font-semibold">{product.name}</h3>
               <p className="text-green-600 font-bold">${product.price.toFixed(2)}</p>
@@ -65,7 +65,7 @@ const Products = () => {
             </div>
           ))
         ) : (
-          <p className="text-center col-span-full text-gray-500">No products found.</p>
+          <p className="text-center col-span-full text-gray-500">This product is not available.</p>
         )}
       </div>
 
@@ -75,6 +75,8 @@ const Products = () => {
         <button className="bg-green-500 text-white px-4 py-2 rounded-md">Next</button>
       </div>
     </div>
+
+    
   );
 };
 

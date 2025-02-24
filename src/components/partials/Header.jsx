@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-import { FaUser } from "react-icons/fa";
 import { MdOutlineEmail } from "react-icons/md";
 import { HiOutlineUserCircle } from "react-icons/hi2";
 import { IoIosLogOut } from "react-icons/io";

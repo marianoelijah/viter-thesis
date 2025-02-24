@@ -3,8 +3,8 @@ import React, { useState } from "react";
 const UserProfile = () => {
   // Sample user data
   const [user, setUser] = useState({
-    name: "John Doe",
-    email: "johndoe@example.com",
+    name: "fampco",
+    email: "fampco@gmail.com",
     phone: "+123456789",
     profileImage: "https://via.placeholder.com/150",
   });
@@ -13,11 +13,10 @@ const UserProfile = () => {
   const orders = [
     { id: 101, product: "Organic Apples", price: 12.99, status: "Delivered", date: "Feb 12, 2025" },
     { id: 102, product: "Fresh Carrots", price: 8.49, status: "Pending", date: "Feb 15, 2025" },
-    { id: 103, product: "Farm Milk", price: 6.99, status: "Shipped", date: "Feb 18, 2025" },
   ];
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
+    <div className="bg-gray-200 min-h-screen p-6">
       <div className="max-w-4xl mx-auto bg-white p-6 rounded-md shadow-md">
         <h1 className="text-3xl font-bold text-center mb-6">User Profile</h1>
 

@@ -27,8 +27,8 @@ const Type = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
-      <div className="max-w-3xl mx-auto bg-white p-6 rounded-md shadow-md">
+    <div className="bg-gray-500 min-h-screen p-6">
+      <div className="max-w mx-auto bg-white p-6 rounded-md shadow-md">
         <h1 className="text-3xl font-bold text-center mb-6">Trade / Sell / Donate</h1>
 
         {/* Product Upload Form */}
@@ -87,8 +87,8 @@ const Type = () => {
             {["Sell", "Trade", "Donate"].map((type) => (
               <label
                 key={type}
-                className={`cursor-pointer px-4 py-2 border rounded-md ${
-                  formData.listingType === type ? "bg-green-600 text-white" : "bg-gray-200"
+                className={`cursor-pointer px-5 py-2 border rounded-md ${
+                  formData.listingType === type ? "bg-green-600 text-white" : "bg-gray-400"
                 }`}
               >
                 <input
@@ -112,7 +112,7 @@ const Type = () => {
           </div>
 
           {/* Submit Button */}
-          <button type="submit" className="mt-4 w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700">
+          <button type="submit" className="mt-4 w-full bg-green-600 text-white py-3 rounded-md hover:bg-blue-700">
             List Item
           </button>
         </form>

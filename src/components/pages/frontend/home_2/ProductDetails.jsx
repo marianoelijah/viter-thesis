@@ -8,7 +8,7 @@ const ProductDetails = () => {
   // Sample product data (this can be replaced with API data)
   const product = {
     id: id,
-    name: "Organic Apples",
+    name: "Apples",
     price: 5.99,
     category: "Fruits",
     description: "Fresh organic apples from local farms. No pesticides, 100% natural.",
@@ -17,7 +17,7 @@ const ProductDetails = () => {
   };
 
   return (
-    <div className="bg-gray-600 p-6">
+    <div className="bg-gray-500 p-6">
       <div className="max-w-4xl mx-auto bg-white p-6 rounded-md shadow-md">
         {/* Product Image & Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -63,10 +63,10 @@ const ProductDetails = () => {
 
         {/* Related Products */}
         <div className="mt-10">
-          <h2 className="text-2xl font-semibold mb-4">Related Products</h2>
+          <h2 className="text-2xl font-semibold mb-4">Local Produce</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((item) => (
-              <div key={item} className="bg-white p-4 rounded-md shadow-md hover:scale-105 transition">
+              <div key={item} className="bg-gray-300 p-4 rounded-md shadow-md hover:scale-105 transition">
                 <img src={`/product${item}.jpg`} alt="Product" className="w-full h-32 object-cover rounded-md" />
                 <h3 className="mt-2 text-sm font-semibold">Product {item}</h3>
                 <p className="text-green-600 font-bold">$4.99</p>
