@@ -6,7 +6,7 @@ const Header = () => {
   return (
     <>
       <div>
-        <header className="bg-green-500 w-full">
+        <header className="bg-green-500 w-full fixed">
           <div className="container">
             <div className="flex justify-between items-center p-2">
               <div className="logo flex justify-between items-center gap-5">
@@ -18,7 +18,7 @@ const Header = () => {
                   />
                 </div>
                 <h5 className="text-black text-2xl font-semibold">
-                  WORLD PEAS
+                  WP
                 </h5>
               </div>
               <nav>
