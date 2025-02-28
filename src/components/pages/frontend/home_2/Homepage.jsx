@@ -6,6 +6,7 @@ import Products from './Products'
 import ProductDetails from './ProductDetails'
 import Type from './Type'
 import Chatbox from './Chatbox'
+import Contacts from './Contacts'
 
 
 const Homepage = () => {
@@ -33,6 +34,7 @@ const Homepage = () => {
     <ProductDetails />
     <Type />
     <Chatbox />
+    <Contacts/>
     </>
   )
 }

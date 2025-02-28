@@ -3,10 +3,10 @@ import React, { useState } from "react";
 const Products = () => {
   // Sample product data
   const products = [
-    { id: 1, name: "Organic Apples", price: 5.99, category: "Fruits", image: "/apple.jpg" },
-    { id: 2, name: "Fresh Carrots", price: 3.49, category: "Vegetables", image: "/carrot.jpg" },
-    { id: 3, name: "Dairy Milk", price: 2.99, category: "Dairy", image: "/milk.jpg" },
-    { id: 4, name: "Whole Wheat", price: 4.49, category: "Grains", image: "/grains.jpg" },
+    { id: 1, name: "Mango", price: 50, category: "Fruits", image: "/mango.jpg" },
+    { id: 2, name: "Fresh Carrots", price: 45, category: "Vegetables", image: "/carrot.jpg" },
+    { id: 3, name: "Dairy Milk", price: 35, category: "Dairy", image: "/milk.jpg" },
+    { id: 4, name: "Whole Wheat", price: 65, category: "Grains", image: "/grains.jpg" },
   ];
 
   const categories = ["All", "Fruits", "Vegetables", "Dairy", "Grains"];
@@ -58,7 +58,7 @@ const Products = () => {
             <div key={product.id} className="bg-gray-300 p-4 rounded-md shadow-md hover:scale-105 transition">
               <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-md" />
               <h3 className="mt-2 font-semibold">{product.name}</h3>
-              <p className="text-green-600 font-bold">${product.price.toFixed(2)}</p>
+              <p className="text-green-600 font-bold">P{product.price.toFixed(2)}</p>
               <button className="mt-2 bg-green-600 text-white px-4 py-2 rounded-md w-full hover:bg-green-700">
                 Add to Cart
               </button>

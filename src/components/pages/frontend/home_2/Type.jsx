@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Type = () => {
   const [formData, setFormData] = useState({
@@ -27,9 +28,11 @@ const Type = () => {
   };
 
   return (
-    <div className="bg-gray-500 min-h-screen p-6">
+    <div className="bg-green-200 min-h-screen p-6">
+      <Link to="/Transactions" className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">Transactions</Link>
       <div className="max-w mx-auto bg-white p-6 rounded-md shadow-md">
-        <h1 className="text-3xl font-bold text-center mb-6">Trade / Sell / Donate</h1>
+        <h1 className="text-4xl font-bold font-oswald text-center mb-6">Transactions</h1>
+        <h2 className="text-2xl font-semibold font-oswald text-center mb-6">BUY / TRADE / DONATE </h2>
 
         {/* Product Upload Form */}
         <form onSubmit={handleSubmit} className="grid gap-4">
@@ -84,7 +87,7 @@ const Type = () => {
 
           {/* Listing Type Selection */}
           <div className="flex justify-between">
-            {["Sell", "Trade", "Donate"].map((type) => (
+            {["Buy", "Trade", "Donate"].map((type) => (
               <label
                 key={type}
                 className={`cursor-pointer px-5 py-2 border rounded-md ${

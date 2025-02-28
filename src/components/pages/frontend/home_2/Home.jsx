@@ -33,10 +33,10 @@ const Home = () => {
                       Organic Apples
                   </h3>
                   <p className='text-green-600 font-bold'>
-                      $5.99 / kg
+                     P75 per kg
                   </p>
                   <button className='mt-2 bg-green-600 text-white px-4 py-2 rounded-md w-full hover:bg-green-700'>
-                        Add to Cart
+                      Add to Cart
                   </button>
               </div>
               <div className='bg-gray-200 p-4 rounded-lg shadow-md hover:scale-105 transition'>
@@ -45,7 +45,7 @@ const Home = () => {
                       Fresh Vegetables
                   </h3>
                   <p className='text-green-600 font-bold'>
-                      $20 / kg
+                      P55 per kg
                   </p>
                   <button className='mt-2 bg-green-600 text-white px-4 py-2 rounded-md w-full hover:bg-green-700'>
                         Add to Cart
@@ -57,7 +57,7 @@ const Home = () => {
                      Grains
                   </h3>
                   <p className='text-green-600 font-bold'>
-                      $5.99 / kg
+                      P69 per kg
                   </p>
                   <button className='mt-2 bg-green-600 text-white px-4 py-2 rounded-md w-full hover:bg-green-700'>
                         Add to Cart
@@ -69,7 +69,7 @@ const Home = () => {
                       Freshly Dairy
                   </h3>
                   <p className='text-green-600 font-bold'>
-                      $5.99 / kg
+                     P50 per kg
                   </p>
                   <button className='mt-2 bg-green-600 text-white px-4 py-2 rounded-md w-full hover:bg-green-700'>
                         Add to Cart
