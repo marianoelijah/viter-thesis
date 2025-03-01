@@ -4,8 +4,8 @@ const Footer = () => {
   return (
     <div className="footer-wrapper">
       <p>
-        © 2024 All Rights Reserved |{" "}
-        <span>Powered by Frontline Business Solutions, Inc.</span>
+        © 2025 All Rights Reserved |{" "}
+        <span>Powered by World Peas</span>
       </p>
     </div>
   );

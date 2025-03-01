@@ -11,13 +11,13 @@ const Header = () => {
             <div className="flex justify-between items-center p-2">
               <div className="logo flex justify-between items-center gap-5">
                 <div className="flex gap-5">
-                  <img
+                  {/* <img
                     className="cursor-pointer w-[50px]"
                     src={`${imgPath}/local.jpg`}
                     alt=""
-                  />
+                  /> */}
                 </div>
-                <h5 className="text-black text-2xl font-semibold">
+                <h5 className="text-black text-2xl font-semibold font-oswald">
                   WP
                 </h5>
               </div>
@@ -33,7 +33,7 @@ const Header = () => {
                     <NavLink>Products</NavLink>
                   </li>
                   <li>
-                    <NavLink>Contacts</NavLink>
+                    <NavLink to="/Contacts">Contacts</NavLink>
                   </li>
                   <li>
                     <NavLink>Transactions</NavLink>

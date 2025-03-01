@@ -1,48 +1,111 @@
-import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
 
-export default function Dashboard() {
-  const [listings, setListings] = useState([]);
+import Footer from "../partials/Footer";
+import Header from "../partials/Header";
+import SideNavigation from "../partials/SideNavigation";
+import DashboardAccordion from "./DashboardAccordion";
+import DashboardCard from "./DashboardCard";
 
-  useEffect(() => {
-    // Fetch listings from backend API
-    fetch("/api/listings")
-      .then((res) => res.json())
-      .then((data) => setListings(data))
-      .catch((err) => console.error("Error fetching listings:", err));
-  }, []);
+import { menus } from "../menu-data";
+import useQueryData from "@/components/custom-hook/useQueryData";
+import FetchingSpinner from "@/components/partials/spinner/FetchingSpinner";
+import TableLoader from "@/components/partials/TableLoader";
+import IconNoData from "../partials/IconNoData";
+import { Bar, BarChart, CartesianGrid, Legend, Rectangle, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-  return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <header className="bg-green-600 text-white p-4 text-center text-xl font-bold">
-        World Peas Dashboard
-      </header>
-      
-      <div className="max-w-6xl mx-auto mt-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold text-green-700">Available Listings</h2>
-          <Link to="/create-listing" className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700">
-            Create Listing
-          </Link>
-        </div>
 
-        {listings.length === 0 ? (
-          <p className="text-center text-gray-600">No listings available.</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {listings.map((listing) => (
-              <div key={listing.id} className="bg-white p-4 rounded-lg shadow-md">
-                <h3 className="text-xl font-bold text-green-600">{listing.title}</h3>
-                <p className="text-gray-700 mt-2">{listing.description}</p>
-                <p className="text-gray-500 mt-1">Price: ${listing.price}</p>
-                <Link to={`/listings/${listing.id}`} className="mt-4 inline-block bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-700">
-                  View Details
-                </Link>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+const Dashboard = ({}) => {
+  const {
+    isFetching: isFetchingCategory,
+    isLoading: isLoadingCategory,
+    error: errorCategory,
+    data: resultCategory,
+  } = useQueryData(
+    `/v2/category`, // endpoint
+    "get", // method
+    "category" // key
   );
-}
+
+  const {
+    isFetching: isFetchingFood,
+    isLoading: isLoadingFood,
+    error: errorFood,
+    data: resultFood,
+  } = useQueryData(
+    `/v2/food`, // endpoint
+    "get", // method
+    "food" // key
+  );
+ console.log(resultFood);
+  return (
+    <>
+      <section className="layout-main">
+        <div className="layout-division">
+          <SideNavigation menu="dashboard" />
+          <main>
+            <Header title="Dashboard" subtitle="Welcome to World Peas!" />
+            <div className="p-5 overflow-y-auto custom-scroll">
+              <div className="grid grid-cols-[1fr_400px] gap-5">
+                <div className="stats">
+                  <div className="chart pb-20">
+                    <ResponsiveContainer width={1000} height={300}>
+                      <h3>Inventory</h3>
+                      <BarChart
+                        width={1200}
+                        height={250}
+                        data={menus.slice(0, 80)}
+                        margin={{
+                          top: 10,
+                          right: 30,
+                          left: 20,
+                          bottom: 5,
+                        }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="menu_title" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar
+                          dataKey="menu_price"
+                          fill="#8884d8"
+                          activeBar={<Rectangle fill="pink" stroke="blue" />}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="relative">
+                    {isFetchingCategory && !isLoadingCategory && (
+                      <FetchingSpinner />
+                    )}
+                    {isLoadingCategory && <TableLoader cols={4} count={20} />}
+                    {resultCategory?.count === 0 && <IconNoData />}
+
+                    <div className="grid grid-cols-4 gap-5 mt-20">
+                      {resultCategory?.count > 0 &&
+                        resultCategory?.data.map((item, key) => {
+                          return (
+                            <DashboardCard
+                              key={key}
+                              item={item}
+                              resultFood={resultFood}
+                            />
+                          );
+                        })}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="sidebar custom-scroll h-[calc(100vh-150px)] overflow-auto">
+                  
+                </div>
+              </div>
+            </div>
+            <Footer />
+          </main>
+        </div>
+      </section>
+    </>
+  );
+};
+
+export default Dashboard;

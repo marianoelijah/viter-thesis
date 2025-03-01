@@ -5,38 +5,47 @@
 @tailwind utilities;
 
 :root {
-  --myred: 88, 12, 31;
-  --myyellow: 215, 168, 58;
-  --mygreen: 215, 168, 58;
-  --accent: 88, 12, 31;
-  --light: 255, 255, 255;
-  --dark: 54, 54, 54;
-  --orange: 244, 173, 76;
-  --primary: 255, 255, 255;
-  --secondary: 245, 245, 245;
-  --line: 223, 223, 223;
-  --alert: 180, 19, 19;
-  --success: 14, 165, 38;
-  --warning: 211, 180, 14;
-  --info: 58, 27, 248;
-  --body: 152, 152, 152;
+  --myred: 227, 24, 55;
+    --myyellow: 215, 168, 58;
+    --accent: 228, 10, 19;
+    --light: 255, 255, 255;
+    --dark: 54, 54, 54;
+    --orange: 244, 173, 76;
+    --primary: 255, 255, 255;
+    --secondary: 245, 245, 245;
+    --line: 223, 223, 223;
+    --alert: 180, 19, 19;
+    --success: 14, 165, 38;
+    --warning: 211, 180, 14;
+    --info: 58, 27, 248;
+    --body: 152, 152, 152;
 }
 
 .dark {
-  --accent: 228, 10, 19;
-  --light: 64, 64, 64;
-  --primary: 13, 17, 23;
-  --secondary: 1, 4, 9;
-  --dark: 255, 255, 255;
-  --line: 48, 54, 61;
-  --alert: 180, 19, 19;
-  --success: 14, 165, 38;
-  --warning: 211, 180, 14;
-  --info: 58, 27, 248;
-  --body: 188, 188, 188;
+    --myred: 227, 24, 55;
+    --myyellow: 215, 168, 58;
+    --accent: 228, 10, 19;
+    --light: 64, 64, 64;
+    --primary: 13, 17, 23;
+    --secondary: 1, 4, 9;
+    --dark: 255, 255, 255;
+    --line: 48, 54, 61;
+    --alert: 180, 19, 19;
+    --success: 14, 165, 38;
+    --warning: 211, 180, 14;
+    --info: 58, 27, 248;
+    --body: 188, 188, 188;
 }
 
 @layer base {
+  body {
+    @apply text-body  font-['Poppins'] leading-tight overflow-x-hidden;
+}
+
+h1, h2, h3, h4, h5 {
+    @apply font-bold
+}
+
   /* * {
     @apply border border-red-500;
   } */

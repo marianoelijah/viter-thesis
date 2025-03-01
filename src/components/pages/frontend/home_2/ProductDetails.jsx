@@ -21,7 +21,7 @@ const ProductDetails = () => {
     category: "Vegetables",
     description: "Fresh lettuce from local farms. No pesticides, 100% natural.",
     seller: { name: "FAMPCO", location: "San Pablo City", contact: "fampco@gmail.com" },
-    image: "/lettuce.jpg"
+    image: "lettuce.jpg"
   };
 
   return (
@@ -30,7 +30,7 @@ const ProductDetails = () => {
         {/* Product Image & Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Product Image */}
-          <img src={`${imgPath}/product.image`} alt="" className="w-full h-96 object-cover rounded-md" />
+          <img src={`${imgPath}/lettuce.jpg`} alt="" className="w-full h-96 object-cover rounded-md" />
   
           {/* Product Details */}
           <div> {/* Replace <> with <div> */}

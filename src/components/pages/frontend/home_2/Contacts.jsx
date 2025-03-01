@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom';
 
 const Contacts = () => {
     const [formData, setFormData] = useState({ name: "", email: "", message: "" });
@@ -15,6 +16,9 @@ const Contacts = () => {
 
   return (
     <div className="p-10 max-w-lg mx-auto bg-green-100 ">
+            <div className="mt-8 flex space-x-4">
+              <Link to="/Contacts" className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">Contacts</Link>
+            </div>
       <h2 className="text-4xl font-bold text-center font-oswald">CONTACT US</h2>
       <p className="mt-4 text-lg font-semibold">Have questions? Reach out to us!</p>
       {submitted ? (

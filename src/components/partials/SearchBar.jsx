@@ -1,7 +1,8 @@
 import React from "react";
 import { FaSearch } from "react-icons/fa";
-import { setError, setIsSearch, setMessage } from "../../store/StoreAction";
+
 import { MdOutlineSearch } from "react-icons/md";
+import { setError, setIsSearch, setMessage } from "../store/storeAction";
 
 const SearchBar = ({
   search,

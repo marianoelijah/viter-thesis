@@ -64,11 +64,11 @@ const Chatbox = () => {
 
     return (
       <div
-        className={`fixed bottom-4 right-4 w-80 bg-white shadow-lg rounded-lg p-4 transition-all duration-300 ${isHovered ? "opacity-100" : "opacity-0"}`}
+        className={`fixed bottom-4 right-4 w-80 bg-blue-300 border shadow-lg rounded-lg p-4 transition-all duration-300 ${isHovered ? "opacity-100" : "opacity-0"}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <h2 className="text-lg font-bold text-green-700">Chatbox</h2>
+        <h2 className="text-2xl font-bold text-black">Chatbox</h2>
         <div className="h-48 overflow-y-auto border p-2 mt-2">
           {messages.map((msg, index) => (
             <div key={index} className={`p-2 my-1 rounded ${msg.sender === user ? "bg-blue-200 text-right" : msg.sender === "AI" ? "bg-yellow-200" : "bg-gray-200"}`}>
