@@ -15,7 +15,7 @@ function checkApiKey()
     $un_pw = explode(":", base64_decode($auth_array[1]));
     $un = $un_pw[0];
 
-    if ($un !== $apiKey["scc_key"]) {
+    if ($un !== $apiKey["fca_key"]) {
         $response = new Response();
         $error = [];
         $response->setSuccess(false);
@@ -231,6 +231,55 @@ function token(
             $decoded = JWT::decode($token, $key, array('HS256'));
             ($object->user_system_email = $decoded->data->email
                 or $object->user_other_email = $decoded->data->email);
+            $result = checkLogin($object);
+            $row = $result->fetch(PDO::FETCH_ASSOC);
+
+            http_response_code(200);
+            $returnData["data"] = $row;
+            $returnData["count"] = $result->rowCount();
+            $returnData["success"] = true;
+            $returnData["message"] = "Access granted.";
+            $response->setData($returnData);
+            $response->send();
+            return $returnData;
+        } catch (Exception $ex) {
+            $response->setSuccess(false);
+            $error["count"] = 0;
+            $error["success"] = false;
+            $error['error'] = "Catch no token found.";
+            $response->setData($error);
+            $response->send();
+            exit;
+        }
+    } else {
+        $response->setSuccess(false);
+        $error["count"] = 0;
+        $error["success"] = false;
+        $error['error'] = "No token found.";
+        $response->setData($error);
+        $response->send();
+        exit;
+    }
+
+    checkEndpoint();
+    http_response_code(200);
+    checkAccess();
+}
+
+// Token
+function tokenDeveloper(
+    $object,
+    $token,
+    $key
+) {
+    $response = new Response();
+    $error = [];
+    $returnData = [];
+
+    if (!empty($token)) {
+        try {
+            $decoded = JWT::decode($token, $key, array('HS256'));
+            ($object->user_developer_email = $decoded->data->email);
             $result = checkLogin($object);
             $row = $result->fetch(PDO::FETCH_ASSOC);
 

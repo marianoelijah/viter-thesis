@@ -1,11 +1,11 @@
 export const checkLocalStorage = () => {
-    let jollibeetoken = null;
+    let productstoken = null;
   
     try {
-      jollibeetoken = JSON.parse(localStorage.getItem("jollibeetoken"));
+      productstoken = JSON.parse(localStorage.getItem("productstoken"));
     } catch (error) {
-      jollibeetoken = null;
+      productstoken = null;
     }
   
-    return jollibeetoken;
+    return productstoken;
   };

@@ -1,17 +1,13 @@
 import DeveloperProtectedRoute from "@/components/pages/backend/access/DeveloperProtectedRoute";
-import Advertisement from "@/components/pages/backend/advertisement/Advertisement";
-import Category from "@/components/pages/backend/category/Category";
-import Dashboard from "@/components/pages/backend/dashboard/Dashboard";
-
-
+import Category from "@/components/pages/backend/Developer/category/Category";
+import Dashboard from "@/components/pages/backend/Developer/dashboard/Dashboard";
+import Role from "@/components/pages/backend/Developer/settings/role/Role";
+import Settings from "@/components/pages/backend/Developer/settings/Settings";
 import Products from "@/components/pages/backend/products/Products";
 import Developer from "@/components/pages/backend/settings/developer/Developer";
+import Users from "@/components/pages/backend/settings/user/Users";
 
-import Role from "@/components/pages/backend/settings/role/Role";
-import Settings from "@/components/pages/backend/settings/Settings";
-import User from "@/components/pages/backend/settings/user/User";
-
-export const routeDeveloper = [
+export const routesDeveloper = [
   {
     route: `/developer/`,
     element: (
@@ -29,10 +25,10 @@ export const routeDeveloper = [
     ),
   },
   {
-    route: `/developer/advertisement`,
+    route: `/developer/category`,
     element: (
       <DeveloperProtectedRoute>
-        <Advertisement />,
+        <Category />
       </DeveloperProtectedRoute>
     ),
   },
@@ -40,24 +36,15 @@ export const routeDeveloper = [
     route: `/developer/products`,
     element: (
       <DeveloperProtectedRoute>
-        <Products />,
+        <Products />
       </DeveloperProtectedRoute>
     ),
   },
-  {
-    route: `/developer/category`,
-    element: (
-      <DeveloperProtectedRoute>
-        <Category />,
-      </DeveloperProtectedRoute>
-    ),
-  },
-
   {
     route: `/developer/settings`,
     element: (
       <DeveloperProtectedRoute>
-        <Settings />,
+        <Settings />
       </DeveloperProtectedRoute>
     ),
   },
@@ -65,25 +52,21 @@ export const routeDeveloper = [
     route: `/developer/settings/role`,
     element: (
       <DeveloperProtectedRoute>
-        <Role />,
-      </DeveloperProtectedRoute>
-    ),
-  },
-  {
-    route: `/developer/settings/developer`,
-    element: (
-      <DeveloperProtectedRoute>
-        <Developer />,
+        <Role/>
       </DeveloperProtectedRoute>
     ),
   },
 
   {
-    route: `/developer/settings/user`,
+    route: `/developer/settings/developer`,
     element: (
       <DeveloperProtectedRoute>
-        <User />
+        <Developer />
       </DeveloperProtectedRoute>
     ),
+  },
+  {
+    route: `/developer/settings/users`,
+    element: <Users />,
   },
 ];

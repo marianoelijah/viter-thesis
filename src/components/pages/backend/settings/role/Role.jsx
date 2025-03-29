@@ -23,13 +23,13 @@ const Role = () => {
 
   return (
     <>
-      <section className="layout-main">
+      <section className="layout-main text-body">
         <div className="layout-division">
-          <SideNavigation menu="role" />
+          <SideNavigation menu="settings" />
           <main>
-            <Header title="Role" subtitle="Welcome to World Peas!" />
+            <Header title="Role" subtitle="Welcome to Worldpeas!" />
             <div className="p-5">
-              <div className="flex justify-between items-end">
+              <div className="flex justify-between items-center">
                 <div></div>
                 <button
                   className="btn btn-add"
@@ -40,8 +40,10 @@ const Role = () => {
                   Add New
                 </button>
               </div>
+              <div className="flex items-end"></div>
               <RoleList setItemEdit={setItemEdit} />
             </div>
+
             <Footer />
           </main>
         </div>

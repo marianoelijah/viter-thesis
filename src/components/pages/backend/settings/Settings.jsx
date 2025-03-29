@@ -7,12 +7,12 @@ import SettingList from "./SettingList";
 const Settings = () => {
   return (
     <>
-      <section className="layout-main">
+      <section className="layout-main text-body">
         <div className="layout-division">
           <SideNavigation menu="settings" />
           <main>
-            <Header title="Settings" subtitle="Welcome to World Peas!" />
-            <div className="p-5">
+            <Header title="Settings" subtitle="Welcome to WorldPeas!" />
+            <div className="p-8">
               <SettingList />
             </div>
             <Footer />

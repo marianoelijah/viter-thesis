@@ -18,8 +18,6 @@ import {
 
 const ModalAddRole = ({ itemEdit }) => {
   const { dispatch, store } = React.useContext(StoreContext);
-  const [value, setValue] = React.useState("");
-  const { uploadPhoto, handleChangePhoto, photo } = useUploadPhoto("");
 
   const queryClient = useQueryClient();
 
@@ -54,16 +52,16 @@ const ModalAddRole = ({ itemEdit }) => {
   };
 
   const initVal = {
-    role_name: itemEdit ? itemEdit.role_name : "",
-    role_description: itemEdit ? itemEdit.role_description : "",
-    role_name_old: itemEdit ? itemEdit.role_name : "",
+    user_name: itemEdit ? itemEdit.user_name : "",
+    user_description: itemEdit ? itemEdit.user_description : "",
+    user_name_old: itemEdit ? itemEdit.user_name : "",
   };
 
   const yupSchema = Yup.object({
-    role_name: Yup.string()
+    user_name: Yup.string()
       .matches(/^[A-Za-z]+$/, "Invalid Name")
       .required("Required"),
-    role_description: Yup.string().required("Required"),
+    user_description: Yup.string().required("Required"),
   });
 
   return (
@@ -93,17 +91,17 @@ const ModalAddRole = ({ itemEdit }) => {
                     <div className="form-wrapper p-4 max-h-[85vh] h-full overflow-y-auto custom-scroll">
                       <div className="input-wrap">
                         <InputText
-                          label="Role Name"
+                          label="User Role Name"
                           type="text"
-                          name="role_name"
+                          name="user_role_name"
                         />
                       </div>
 
                       <div className="input-wrap mt-8">
                         <InputTextArea
-                          label="Role Description"
+                          label="User Role Description"
                           type="text"
-                          name="role_description"
+                          name="user_role_description"
                         />
                       </div>
                     </div>

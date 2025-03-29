@@ -1,6 +1,5 @@
-import { Frown, Info, Trash2, X } from "lucide-react";
+import { Frown } from "lucide-react";
 import React from "react";
-import ModalWrapper from "./ModalWrapper";
 import { setError } from "@/components/store/storeAction";
 import { StoreContext } from "@/components/store/storeContext";
 

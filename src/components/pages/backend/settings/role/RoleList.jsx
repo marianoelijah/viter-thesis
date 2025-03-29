@@ -2,7 +2,6 @@ import useQueryData from "@/components/custom-hook/useQueryData";
 import Loadmore from "@/components/partials/LoadMore";
 import ModalDelete from "@/components/partials/modal/ModalDelete";
 import ModalRestore from "@/components/partials/modal/ModalRestore";
-import FetchingSpinner from "@/components/partials/spinner/FetchingSpinner";
 import TableLoader from "@/components/partials/TableLoader";
 import {
   setIsAdd,
@@ -17,6 +16,7 @@ import IconNoData from "../../partials/IconNoData";
 import IconServerError from "../../partials/IconServerError";
 import ModalArchive from "../../partials/modals/ModalArchive";
 import Pills from "../../partials/Pills";
+import SpinnerTable from "../../developer/partial/spinners/SpinnerTable";
 
 const RoleList = ({ setItemEdit }) => {
   const [id, setIsId] = React.useState("");
@@ -61,7 +61,7 @@ const RoleList = ({ setItemEdit }) => {
   return (
     <>
       <div className="p-4 bg-secondary rounded-md mt-10 border border-line relative">
-        {isFetching && !isLoading && <FetchingSpinner />}
+        {isFetching && !isLoading && <SpinnerTable />}
         <div className="table-wrapper custom-scroll">
           <table>
             <thead>

@@ -23,7 +23,7 @@ const Category = () => {
 
   return (
     <>
-      <section className="layout-main">
+      <section className="layout-main text-body">
         <div className="layout-division">
           <SideNavigation menu="category" submenu="read" />
           <main>
@@ -31,7 +31,8 @@ const Category = () => {
             <div className="p-8">
               <div className="flex justify-between items-center ">
               <div></div>
-                <button className="btn btn-add" onClick={handleAdd}>
+                <button className="btn btn-add" 
+                onClick={handleAdd}>
                   <Plus size={16} />
                   Add New
                 </button>

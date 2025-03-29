@@ -7,7 +7,7 @@ import { InputText, InputTextArea } from "@/components/helpers/FormInputs";
 import { queryData } from "@/components/helpers/queryData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Form, Formik } from "formik";
-import SpinnerButton from "../../partials/spinners/SpinnerButton";
+
 import ModalWrapper from "../../partials/modals/ModalWrapper";
 import {
   setError,
@@ -15,10 +15,10 @@ import {
   setMessage,
   setSuccess,
 } from "@/components/store/storeAction";
+import SpinnerButton from "../../developer/partial/spinners/SpinnerButton";
 
 const ModalAddRole = ({ itemEdit }) => {
   const { dispatch, store } = React.useContext(StoreContext);
-  const [value, setValue] = React.useState("");
   const { uploadPhoto, handleChangePhoto, photo } = useUploadPhoto("");
 
   const queryClient = useQueryClient();
@@ -71,7 +71,7 @@ const ModalAddRole = ({ itemEdit }) => {
       <ModalWrapper>
         <div className="modal-side absolute top-0 right-0 bg-primary h-[100dvh] w-[300px] border-l border-line">
           <div className="modal-header p-4 flex justify-between items-center">
-            <h5 className="mb-0">Add role</h5>
+          <h5 className="mb-0">{itemEdit ? "Edit" : "Add"} role</h5>
             <button onClick={handleClose}>
               <X />
             </button>

@@ -43,6 +43,6 @@ export const getUrlParam = () => {
 
 // storage after login
 export function setStorageRoute(jwt) {
-  localStorage.setItem("jollibeetoken", JSON.stringify({ token: jwt }));
+  localStorage.setItem("productstoken", JSON.stringify({ token: jwt }));
 
 }

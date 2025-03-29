@@ -50,7 +50,7 @@ const Login = () => {
             return (
               <Form>
 
-                  <h5 className="text-center">Welcome to Jollibee Kiosk!</h5>
+                  <h5 className="text-center">Welcome to WorldPeas!</h5>
 
                   <div className="input-wrap">
                     <InputText
@@ -90,7 +90,7 @@ const Login = () => {
                     to="/"
                     className="text-sm text-center block mt-5 hover:text-accent"
                   >
-                    Go Back to Kiosk
+                    Go Back to Welcome Page!
                   </Link>
 
               </Form>

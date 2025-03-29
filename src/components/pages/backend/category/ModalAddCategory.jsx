@@ -140,7 +140,7 @@ const ModalAddCategory = ({ isCategoryEdit, setIsCategoryEdit }) => {
                                 ? URL.createObjectURL(photo) // preview
                                 : imgPath + "/" + isCategoryEdit?.category_image // check db
                             }
-                            alt="food photo"
+                            alt="product photo"
                             className={`group-hover:opacity-30 duration-200 relative object-cover h-full w-full  m-auto `}
                           />
                         )}
@@ -175,6 +175,7 @@ const ModalAddCategory = ({ isCategoryEdit, setIsCategoryEdit }) => {
               );
             }}
           </Formik>
+          
         </div>
       </ModalWrapper>
     </>

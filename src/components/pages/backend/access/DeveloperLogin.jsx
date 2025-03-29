@@ -101,7 +101,7 @@ const DeveloperLogin = () => {
               alt=""
               className="w-[150px] mx-auto mb-2"
             />
-            <h5 className="text-center">Welcome to Jollibee Kiosk</h5>
+            <h5 className="text-center">Welcome to WorldPeas</h5>
 
 
             <Formik
@@ -164,7 +164,7 @@ const DeveloperLogin = () => {
                       to="/"
                       className="text-sm text-center block mt-5 hover:text-accent"
                     >
-                      Go Back to Kiosk
+                      Go Back to Home
                     </Link>
                   </Form>
                 );

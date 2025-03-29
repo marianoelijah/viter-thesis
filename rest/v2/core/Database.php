@@ -11,7 +11,7 @@ class Database
 
         // Localhost
         $host = "localhost";
-        $dbname = "zenorobe_v1";
+        $dbname = "worldpeas_v2";
         $username = "root";
         $password = "";
 

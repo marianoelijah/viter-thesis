@@ -13,10 +13,10 @@ import {
 import { StoreContext } from "@/components/store/storeContext";
 import { Archive, ArchiveRestore, FilePenLine, Trash2 } from "lucide-react";
 import React from "react";
+import Pills from "../../developer/partial/Pills";
+import ModalArchive from "../../developer/partial/modals/ModalArchive";
 import IconNoData from "../../partials/IconNoData";
 import IconServerError from "../../partials/IconServerError";
-import ModalArchive from "../../partials/modals/ModalArchive";
-import Pills from "../../partials/Pills";
 
 const UserList = ({ setItemEdit }) => {
   const [id, setIsId] = React.useState("");
@@ -108,12 +108,12 @@ const UserList = ({ setItemEdit }) => {
                         <Pills text="Inactive" />
                       )}
                     </td>
-                    <td>{item.role_name}</td>
-                    <td>{item.role_description}</td>
+                    <td>{item.user_name}</td>
+                    <td>{item.user_description}</td>
                     <td></td>
                     <td>
                       <ul className="table-action">
-                        {item.role_is_active === 1 ? (
+                        {item.user_is_active === 1 ? (
                           <>
                             <li>
                               <button
@@ -172,23 +172,23 @@ const UserList = ({ setItemEdit }) => {
         {store.isDelete && (
           <ModalDelete
             setIsDelete={setIsDelete}
-            mysqlApiDelete={`/v2/role/${id}`}
-            queryKey={"role"}
-            item={dataItem.role_name}
+            mysqlApiDelete={`/v2/user/${id}`}
+            queryKey={"user"}
+            item={dataItem.user_name}
           />
         )}
         {store.isArchive && (
           <ModalArchive
             setIsArchive={setIsArchive}
-            mysqlEndpoint={`/v2/role/active/${id}`}
-            queryKey={"role"}
+            mysqlEndpoint={`/v2/user/active/${id}`}
+            queryKey={"user"}
           />
         )}
         {store.isRestore && (
           <ModalRestore
             setIsRestore={setIsRestore}
-            mysqlEndpoint={`/v2/role/active/${id}`}
-            queryKey={"role"}
+            mysqlEndpoint={`/v2/user/active/${id}`}
+            queryKey={"user"}
           />
         )}
       </div>

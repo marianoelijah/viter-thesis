@@ -11,13 +11,13 @@ const DeveloperProtectedRoute = ({ children }) => {
   const { dispatch, store } = React.useContext(StoreContext);
   const [loading, setLoading] = React.useState(false);
   const [isAuth, setIsAuth] = React.useState("");
-  const jollibeetoken = JSON.parse(localStorage.getItem("jollibeetoken"));
+  const productstoken = JSON.parse(localStorage.getItem("productstoken"));
   const [pageStatus, setPageStatus] = React.useState(false);
 
   React.useEffect(() => {
     const fetchLogin = async () => {
       const login = await queryData(`/v2/developer/token`, "post", {
-        token: jollibeetoken.token,
+        token: productstoken.token,
       });
       if (typeof login === "undefined" || !login.success) {
         setLoading(false);
@@ -45,12 +45,12 @@ const DeveloperProtectedRoute = ({ children }) => {
         setPageStatus(true);
       }
     };
-    if (jollibeetoken !== null) {
+    if (productstoken !== null) {
       fetchLogin();
     } else {
       setIsAuth("456");
       setLoading(false);
-      localStorage.removeItem("jollibeetoken");
+      localStorage.removeItem("productstoken");
     }
   }, [dispatch]);
 
@@ -63,10 +63,8 @@ const DeveloperProtectedRoute = ({ children }) => {
           <FetchingSpinner />
         ) : isAuth === "123" ? (
           children
-        ) : isAuth === "456" ? (
-          <Navigate to={`${devNavUrl}/developer/login`} />
         ) : (
-          <p>End point not found.</p>
+          <Navigate to={`${devNavUrl}/developer/login`} />
         )}
       </>
     );
