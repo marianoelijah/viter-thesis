@@ -20,8 +20,9 @@ $data = json_decode($body, true);
 // get $_GET data
 // validate api key
 if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-  checkApiKey();
+  //checkApiKey();
   if (array_key_exists("developerkey", $_GET)) {
+    // check data
     $developer->user_developer_key = $_GET['developerkey'];
 
     $query = checkReadKey($developer);

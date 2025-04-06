@@ -2,23 +2,23 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Header1 from "../home/Header1";
 
-
-
-
-
 const Welcome = () => {
   return (
     <>
-      <Header1/>
-      <div className="min-h-screen flex flex-col items-center justify-center bg-green-100 p-6">
+    <Header1 />
+    <div className="min-h-screen flex flex-col items-center justify-center bg-green-100 p-6">
       <header className="text-center">
         <h1 className="text-5xl font-bold text-green-700">Welcome to World Peas</h1>
         <p className="mt-4 text-lg text-gray-700">A platform for farmers to trade, sell, and donate resources.</p>
       </header>
       
       <div className="mt-8 flex space-x-4">
-        <Link to="/register" className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">Get Started</Link>
-        <Link to="/login2" className="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700">Login</Link>
+        <Link to="/register" className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">
+          Get Started
+        </Link>
+        <Link to="/register" className="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700">
+          Login
+        </Link>
       </div>
 
       <section className="mt-12 w-full max-w-4xl text-center">
@@ -39,8 +39,7 @@ const Welcome = () => {
         </div>
       </section>
     </div>
-
-    </>
+  </>
   );
 };
 

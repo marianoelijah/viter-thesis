@@ -99,6 +99,7 @@ const DeveloperList = ({ setItemEdit }) => {
   };
 
   let counter = 1;
+
   return (
     <>
       <div className="mt-5">
@@ -237,6 +238,7 @@ const DeveloperList = ({ setItemEdit }) => {
             />
           </div>
         </div>
+      </div>
         {store.isDelete && (
           <ModalDelete
             setIsDelete={setIsDelete}
@@ -260,8 +262,8 @@ const DeveloperList = ({ setItemEdit }) => {
           />
         )}
 
-        {store.isConfirm && <ModalConfirm />}
-      </div>
+        {/* {store.isConfirm && <ModalConfirm />} */}
+      
     </>
   );
 };

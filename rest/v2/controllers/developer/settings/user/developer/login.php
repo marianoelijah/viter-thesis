@@ -8,8 +8,6 @@ require '../../../../../jwt/vendor/autoload.php';
 // require 'functions.php';
 // use needed classes
 require '../../../../../models/developer/settings/user/developer/Developer.php';
-// get payload
-
 // check database connection
 
 $conn = null;

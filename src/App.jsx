@@ -8,17 +8,20 @@ import SetPassword from "./components/pages/backend/access/SetPassword";
 import DeveloperCreatePassword from "./components/pages/backend/access/create-password/DeveloperCreatePassword";
 import ForgotPassword from "./components/pages/backend/access/ForgotPassword";
 import Login from "./components/pages/backend/access/Login";
-import Register from "./components/pages/frontend/partials2/Register";
 import CreateListing from "./components/pages/frontend/home/CreateListing";
 import Dashboard from "./components/pages/frontend/Dashboard";
 import Contacts from "./components/pages/frontend/home/Contacts";
 import Homepage from "./components/pages/frontend/home/Homepage";
 import Transactions from "./components/pages/frontend/home/Transactions";
 import Inventory from "./components/pages/frontend/home/Inventory";
-import TransactionPage from "./components/pages/frontend/home/TransactionPage";
 import { useState } from "react";
 import { routesDeveloper } from "./routes/routesDeveloper";
+import Checkout from "./components/pages/frontend/home/Checkout";
+import Productss from "./components/pages/frontend/home/Productss";
 import Login2 from "./components/pages/frontend/partials2/Login2";
+import LoginRegister from "./components/pages/Auth/LoginRegister";
+import AuthLogin from "./components/pages/Auth/AuthLogin";
+
 
 const App = () => {
   const [cart, setCart] = useState([]);
@@ -31,12 +34,17 @@ const App = () => {
       <Router>
         <Routes>
           <Route index element={<Welcome />} />
+          <Route path="/" element={<LoginRegister />} />
           <Route path="/home" element={<Homepage />} />
+          <Route path="/home/products" element={<Productss />} />
+          <Route path="/home/productss" element={<Productss />} />
           <Route path="/home/contacts" element={<Contacts />} />
-          <Route path="/transactions" element={<Transactions />} />
-
+          <Route path="/home/transactions" element={<Transactions />} />
+          <Route path="/login2" element={<Login2 />} />
+          <Route path="/register" element={<LoginRegister />} />
+          <Route path="/authlogin" element={<AuthLogin />} />
           <Route path="/inventory" element={<Inventory cart={cart} setCart={setCart} />} />
-          <Route path="/transaction" element={<TransactionPage />} />
+          <Route path="/checkout" element={<Checkout />} />
 
 
           {routesAdmin.map((item, key) => {
@@ -51,8 +59,6 @@ const App = () => {
             })}
 
           <Route path="/login" element={<Login />} />
-          <Route path="/login2" element={<Login2 />} />
-          <Route path="/register" element={<Register />} />
 
           <Route path="/create-listing" element={<CreateListing />} />
           <Route path="/dashboard" element={<Dashboard />} />

@@ -8,21 +8,24 @@ import SideNavigation from "../../partials/SideNavigation";
 import Header from "../../partials/Header";
 import Footer from "../../partials/Footer";
 import ToastSuccess from "../../partials/ToastSuccess";
-
 import { FaPlus } from "react-icons/fa";
 import DeveloperList from "../../developer/settings/developer/DeveloperList";
-
-
 
 const Developer = () => {
   const { dispatch, store } = React.useContext(StoreContext);
   const [itemEdit, setItemEdit] = React.useState(null);
 
-  const { isFetching, data: role } = useQueryData(`/v2/role`, "get", "role");
+  const { 
+    isFetching, 
+    data: role, 
+  } = useQueryData(
+    `/v2/role`, 
+    "get", 
+    "role"
+  );
 
   const developerRole = role?.data.filter(
-    (item) => item.role_is_developer == 1
-  );
+    (item) => item.role_is_developer == 1);
 
   const handleAdd = () => {
     if (developerRole?.length === 0) {
@@ -33,6 +36,7 @@ const Developer = () => {
     dispatch(setIsAdd(true));
     setItemEdit(null);
   };
+
   return (
     <>
       <section className="layout-main">
@@ -40,7 +44,7 @@ const Developer = () => {
           <SideNavigation menu="settings" />
           <main>
             <Header title="Developer" subtitle="Welcome to WorldPeas!" />
-            <div className="p-8">
+            <div className="p-5">
               <div className="flex justify-between items-end">
 
                 <div></div>
@@ -48,8 +52,7 @@ const Developer = () => {
                  {/* {isFetching ? (
                   "Loading..."
                 ) : (
-                  */}
-
+                   */}
                 <button
                   type="button"
                   className="btn btn-add"
@@ -57,6 +60,7 @@ const Developer = () => {
                 >
                   <FaPlus /> Add New
                 </button>
+                {/* )} */}
               </div>
               <DeveloperList setItemEdit={setItemEdit} />
             </div>

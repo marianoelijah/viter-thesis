@@ -1,6 +1,6 @@
 <?php
 
-// Read Active
+// Read active
 function checkFilterActive($object)
 {
     $query = $object->filterActive();
@@ -8,7 +8,7 @@ function checkFilterActive($object)
     return $query;
 }
 
-// Read Active Search
+// Read active
 function checkFilterActiveSearch($object)
 {
     $query = $object->filterActiveSearch();

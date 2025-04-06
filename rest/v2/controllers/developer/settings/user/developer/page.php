@@ -7,6 +7,7 @@ require '../../../../../core/functions.php';
 // use needed classes
 require '../../../../../models/developer/settings/user/developer/Developer.php';
 
+
 // check database connection
 $conn = null;
 $conn = checkDbConnection();
@@ -21,7 +22,7 @@ if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
         // get data
         // get task id from query string
         $developer->developer_start = $_GET['start'];
-        $developer->developer_total = 1;
+        $developer->developer_total = 11;
         //check to see if task id in query string is not empty and is number, if not return json error
         checkLimitId($developer->developer_start, $developer->developer_total);
 

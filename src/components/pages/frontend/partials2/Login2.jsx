@@ -1,30 +1,71 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const Login2 = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-        const [email, setEmail] = useState("");
-        const [password, setPassword] = useState("");
-      
-        const handleLogin = (e) => {
-          e.preventDefault();
-          console.log("Logging in with", email, password);
-        };
+  const handleLogin = async (event) => {
+    event.preventDefault();
 
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-black p-6">
-              <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-                <h2 className="text-2xl font-bold text-center text-green-700">Login to World Peas</h2>
-                <form className="mt-4" onSubmit={handleLogin}>
-                  <input type="email" placeholder="Email" className="w-full p-2 border rounded mb-4" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                  <input type="password" placeholder="Password" className="w-full p-2 border rounded mb-4" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                  <button type="submit" className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Login</button>
-                </form>
-                <p className="mt-4 text-center text-gray-600">Don't have an account? 
-                  <Link to="/register" className="text-green-600">Sign Up</Link></p>
-              </div>
-            </div>
-          );
-        }  
+    try {
+      const response = await axios.post("http://localhost:3000/login", {
+        email,
+        password,
+      });
 
-export default Login2
+      if (response.data.Status === "Login successful") {
+        navigate("/home");
+      } else {
+        alert(response.data.Error);
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Login failed. Please try again.");
+    }
+  };
+
+  return (
+    <div className="flex justify-content-center align-items-center vh-100 bg-primary">
+      <div className="p-4 bg-white rounded shadow w-25">
+        <h2 className="text-center mb-4">Login</h2>
+        <form onSubmit={handleLogin}>
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="form-control"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              className="form-control"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-success w-100">
+            Login
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default Login2;

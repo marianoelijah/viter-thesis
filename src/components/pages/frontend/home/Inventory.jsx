@@ -54,12 +54,18 @@ const Inventory = () => {
         </div>
       )}
 
-      <div className="text-center mt-6">
+      <div className="text-center mt-6 mx-2 space-x-4">
         <button 
-          onClick={() => navigate("/transactions")} 
-          className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+          onClick={() => navigate("/home/productss")} 
+          className="bg-green-600 text-white px-4 py-2 justify-between rounded-md hover:bg-blue-600"
         >
           Continue Shopping
+        </button>
+        <button 
+          onClick={() => navigate("/checkout")} 
+          className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+        >
+          Proceed to Checkout
         </button>
       </div>
     </div>

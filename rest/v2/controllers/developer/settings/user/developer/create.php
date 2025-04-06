@@ -5,6 +5,7 @@ $conn = checkDbConnection();
 // make instance of classes
 $developer = new Developer($conn);
 $encrypt = new Encryption();
+// use notification email
 require '../../../../../notification/verify-account.php';
 
 // check data
@@ -21,6 +22,7 @@ $developer->user_developer_datetime = date("Y-m-d H:i:s");
 
 $password_link = '/developer/create-password';
 
+//checks newly added data if it already exists
 isEmailExist($developer, $developer->user_developer_email);
 
 sendEmail(
@@ -28,7 +30,6 @@ sendEmail(
     $developer->user_developer_first_name,
     $developer->user_developer_email,
     $developer->user_developer_key,
-
 );
 
 $query = checkCreate($developer);

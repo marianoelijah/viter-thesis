@@ -24,6 +24,7 @@ $data = json_decode($body, true);
 if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
   checkApiKey();
   checkPayload($data);
+
   $developer->user_developer_password = $encrypt->doPasswordHash($data['new_password']);
   $developer->user_developer_key = $data['key'];
   $developer->user_developer_datetime = date('Y-m-d H:i:s');

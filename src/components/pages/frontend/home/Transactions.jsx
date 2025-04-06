@@ -1,13 +1,13 @@
 import { imgPath } from "@/components/helpers/functions-general";
-import React, { useEffect } from "react";
+import { AuthContext } from "@/context/AuthContext";
+import React, { useContext, useEffect } from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// toast.configure();
-
 const Transactions = () => {
+  const navigate = useNavigate();
   const [selectedTrade, setSelectedTrade] = useState(""); // Selected product to receive
   const [offeredTrade, setOfferedTrade] = useState(""); // Product to give in exchange
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -16,6 +16,10 @@ const Transactions = () => {
   const [inventory, setInventory] = useState([]);
   const [cart, setCart] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [tradeDetails, setTradeDetails] = useState({
+    receiveProduct: "",
+    exchangeProduct: "",
+  });
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(storedCart);
@@ -48,6 +52,7 @@ const Transactions = () => {
   // Handle Input Change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setTradeDetails({ ...tradeDetails, [e.target.name]: e.target.value });
   };
 
   // Handle File Upload
@@ -96,20 +101,17 @@ const Transactions = () => {
           Transactions
         </button>
         {dropdownOpen && (
-          <div className="absolute mt-2 bg-white shadow-lg rounded-md">
-            <button className="block px-4 py-2 w-full text-left hover:bg-gray-200" onClick={() => setSelectedTab("Trade")}>
-              Trade
-            </button>
-            <button className="block px-4 py-2 w-full text-left hover:bg-gray-200" onClick={() => setSelectedTab("Buy")}>
-              Buy
-            </button>
-            <button className="block px-4 py-2 w-full text-left hover:bg-gray-200" onClick={() => setSelectedTab("Donate")}>
-              Donate
-            </button>
-            <button className="block px-4 py-2 w-full text-left hover:bg-gray-200" onClick={() => setSelectedTab("Check-Out")}>
-              Check-Out
-            </button>
-          </div>
+           <div className="absolute mt-2 bg-white shadow-lg rounded-md">
+           <button className="block px-4 py-2 w-full text-left hover:bg-gray-200" onClick={() => {setSelectedTab("Trade"); }}>
+             Trade
+           </button>
+           <button className="block px-4 py-2 w-full text-left hover:bg-gray-200" onClick={() => {setSelectedTab("Buy"); }}>
+             Buy
+           </button>
+           <button className="block px-4 py-2 w-full text-left hover:bg-gray-200" onClick={() => {setSelectedTab("Donate"); }}>
+             Donate
+           </button>
+         </div>
         )}
       </div>
 
@@ -194,6 +196,7 @@ const Transactions = () => {
       </div>
     )}
 
+     <Link to="/checkout">
     <button
       className={`mt-4 bg-blue-600 text-white px-4 py-2 rounded-md w-full hover:bg-blue-700 ${
         (!selectedTrade || !offeredTrade) && "opacity-50 cursor-not-allowed"
@@ -203,8 +206,11 @@ const Transactions = () => {
     >
       Trade Now
     </button>
+    </Link>
+
   </div>
 )}
+  
 
         {selectedTab === "Donate" && (
           <div className="mt-4">
@@ -213,105 +219,18 @@ const Transactions = () => {
               <input type="text" placeholder="Product Name" className="w-full p-2 border rounded-md mb-2" />
               <input type="text" placeholder="Quantity" className="w-full p-2 border rounded-md mb-2" />
               <textarea placeholder="Additional Notes" className="w-full p-2 border rounded-md mb-2"></textarea>
+              <Link to="/checkout">
               <button className="bg-yellow-600 text-white px-4 py-2 rounded-md w-full hover:bg-yellow-700">
                 Donate
               </button>
+              </Link>
             </form>
           </div>
-        )}
-
-        {selectedTab === "Check-Out" && (
-          <div className="mt-4">
-            <h3 className="font-semibold text-lg">BUY / TRADE / DONATE</h3>
-            {/* Product Upload Form */}
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          {/* Product Title */}
-          <input
-            type="text"
-            name="title"
-            placeholder="Product Name"
-            value={formData.title}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded-md w-full"
-          />
-
-          {/* Category Selection */}
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded-md w-full"
-          >
-            <option value="">Select Category</option>
-            <option value="Fruits">Fruits</option>
-            <option value="Vegetables">Vegetables</option>
-            <option value="Herbs&Spices">Herbs & Spices</option>
-          </select>
-
-          {/* Description */}
-          <textarea
-            name="description"
-            placeholder="Product Description"
-            value={formData.description}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded-md w-full h-24"
-          />
-
-          {/* Price Input (Only for Sell or Trade) */}
-          {formData.listingType !== "Donate" && (
-            <input
-              type="number"
-              name="price"
-              placeholder="Price ($)"
-              value={formData.price}
-              onChange={handleChange}
-              required
-              className="border p-2 rounded-md w-full"
-            />
-          )}
-
-          {/* Listing Type Selection */}
-          <div className="flex justify-between">
-            {["Buy", "Trade", "Donate"].map((type) => (
-              <label
-                key={type}
-                className={`cursor-pointer px-5 py-2 border rounded-md ${
-                  formData.listingType === type ? "bg-green-600 text-white" : "bg-gray-400"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="listingType"
-                  value={type}
-                  checked={formData.listingType === type}
-                  onChange={handleChange}
-                  className="hidden"
-                />
-                {type}
-              </label>
-            ))}
-          </div>
-
-          {/* Image Upload */}
-          <div>
-            <label className="block mb-2 text-gray-600">Upload Image:</label>
-            <input type="file" accept="image/*" onChange={handleImageUpload} className="border p-2 rounded-md w-full" />
-            {formData.image && <img src={formData.image} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded-md" />}
-          </div>
-
-          {/* Submit Button */}
-          <button type="submit" className="mt-4 w-full bg-green-600 text-white py-3 rounded-md hover:bg-blue-700">
-            List Item
-          </button>
-        </form>
-      </div>
         )}
       </div>
     </div>
   );
-};
+ };
+
 
 export default Transactions;

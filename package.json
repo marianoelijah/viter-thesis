@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"npm run dev-client\" \"npm run dev-server\"",
+    "dev-client": "vite",
+    "dev-server": "node server.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -37,7 +39,7 @@
     "react-dom": "^18.3.1",
     "react-icons": "^5.5.0",
     "react-intersection-observer": "^9.15.1",
-    "react-router-dom": "^6.29.0",
+    "react-router-dom": "^6.30.0",
     "react-toastify": "^11.0.5",
     "recharts": "^2.15.1",
     "sequelize": "^6.37.6",
@@ -54,6 +56,7 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.2",
     "eslint": "^9.13.0",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",

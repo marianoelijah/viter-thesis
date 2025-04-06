@@ -1,5 +1,6 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
+import { imgPath } from '@/components/helpers/functions-general'
 
 const Header1 = () => {
   return (
@@ -11,12 +12,14 @@ const Header1 = () => {
               <div className="logo flex justify-between items-center gap-5">
                 <div className="flex gap-5">
                 </div>
-                <h5 className="text-black text-2xl font-semibold font-oswald hover:text-white">
-                  WP
-                </h5>
+                <img
+                  src={`${imgPath}/logo.jpg`}
+                  alt=""
+                  className="h-[2px] w-[2px]"
+                />
               </div>
               <nav>
-                <ul className="navi flex gap-10 text-[20px] font-bold text-black ">
+                <ul className="navi flex gap-10 text-[20px] font-bold text-black">
                 <li>
                     <NavLink to="home" className="hover:text-white">Home</NavLink>
                   </li>
@@ -35,9 +38,12 @@ const Header1 = () => {
                 </ul>
               </nav>
               
-              <button className="text-white text-md font-semibold tracking-wider border border-white border-opacity-40 p-4 rounded-md hover:text-black hover:bg-white transition-all">
-                Sign-up
+              <Link to="/register">
+              <button className="text-white text-md font-semibold tracking-wider border border-white border-opacity-40 p-3 rounded-md hover:text-black hover:bg-white transition-all">
+                Apply Now!
               </button>
+              </Link>
+              
             </div>
           </div>
         </header>
