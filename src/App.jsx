@@ -34,7 +34,6 @@ const App = () => {
       <Router>
         <Routes>
           <Route index element={<Welcome />} />
-          <Route path="/" element={<LoginRegister />} />
           <Route path="/home" element={<Homepage />} />
           <Route path="/home/products" element={<Productss />} />
           <Route path="/home/productss" element={<Productss />} />

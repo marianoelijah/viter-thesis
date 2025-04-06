@@ -40,7 +40,7 @@ const Header1 = () => {
               
               <Link to="/register">
               <button className="text-white text-md font-semibold tracking-wider border border-white border-opacity-40 p-3 rounded-md hover:text-black hover:bg-white transition-all">
-                Apply Now!
+                Join Now!
               </button>
               </Link>
               

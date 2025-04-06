@@ -1,123 +1,143 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import "@/assets/style.css";  // Use alias for src/assets/style.css
 
+function LoginRegister() {
+  const [isRegistering, setIsRegistering] = useState(false);
+  const navigate = useNavigate();
 
-const LoginRegister = () => {
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [values, setValues] = useState({ email: '', password: '' });
-    const navigate = useNavigate();
+  const [registerData, setRegisterData] = useState({
+    username: '',
+    email: '',
+    password: '',
+  });
 
-    function SwitchContent() {
-        const content = document.getElementById('content');
-        const registerBtn = document.getElementById('register');
-        const loginBtn = document.getElementById('login');
+  const [loginData, setLoginData] = useState({
+    email: '',
+    password: '',
+  });
 
-        registerBtn.addEventListener('click', () => {
-            content.classList.add("active");
-        });
-        loginBtn.addEventListener('click', () => {
-            content.classList.remove("active");
-        });
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:3000/register', registerData);
+      navigate('/home');
+    } catch (err) {
+      console.error('Register Error:', err);
     }
+  };
 
-    function register(event) {
-        event.preventDefault();
-        axios.post("http://localhost:3000/register", { username, email, password })
-            .then(res => {
-                navigate.push("/home");
-            }).catch(err => console.log(err));
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post('http://localhost:3000/login', loginData);
+      if (res.data.Status === 'Login successful') {
+        navigate('/home');
+      } else {
+        alert(res.data.Error);
+      }
+    } catch (err) {
+      console.error('Login Error:', err);
     }
+  };
 
-    function login(event) {
-        event.preventDefault();
-        axios.post("http://localhost:3000/login", values)
-            .then(res => {
-                console.log("Response from server:", res.data);
-                if (res.data.Status === "Login successful") {
-                    navigate.push("/home");
-                } else {
-                    alert(res.data.Error);
-                }
-            }).catch(err => {
-                console.error("Login error:", err);
-            });
-    }
-
-    return (
-        <div className='content justify-content-center align-items-center flex shadow-lg' id='content'>
-            <div className='col-md-6 flex justify-content-center'>
-                <form onSubmit={register}>
-                    <div className='header-text mb-4'>
-                        <h1>Create Account</h1>
-                    </div>
-                    <div className='input-group mb-3'>
-                        <input type='text' placeholder='Name' className='form-control form-contol-lg bg-light fs-6' onChange={e => setUsername(e.target.value)}></input>
-                    </div>
-                    <div className='input-group mb-3'>
-                        <input type='email' placeholder='Email' className='form-control form-contol-lg bg-light fs-6' onChange={e => setEmail(e.target.value)}></input>
-                    </div>
-                    <div className='input-group mb-3'>
-                        <input type='password' placeholder='Password' className='form-control form-contol-lg bg-light fs-6' onChange={e => setPassword(e.target.value)}></input>
-                    </div>
-                    <div className='input-group mb-3 justify-content-center '>
-                        <button className='btn border-white text-white w-50 fs-6'>Register</button>
-                    </div>
-                </form>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#F6F4EC] font-poppins transition-all duration-700">
+      <div className="w-full max-w-4xl bg-white rounded-3xl shadow-lg overflow-hidden flex">
+        {/* Left side form */}
+        <div className={`w-1/2 p-10 flex flex-col justify-center transition-all duration-500 ease-in-out transform ${isRegistering ? "-translate-x-full opacity-0 absolute pointer-events-none" : "opacity-100 relative"}`}>
+          <h2 className="text-3xl font-bold text-[#2F5233] mb-6">Sign In</h2>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input
+              type="email"
+              placeholder="Email"
+              className="w-full px-4 py-2 rounded bg-green-50 focus:outline-none"
+              onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              className="w-full px-4 py-2 rounded bg-green-50 focus:outline-none"
+              onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+            />
+            <div className="flex justify-between text-sm text-gray-600">
+              <label>
+                <input type="checkbox" className="mr-1" />
+                Remember me
+              </label>
+              <a href="#" className="text-green-800 hover:underline">
+                Forgot Password?
+              </a>
             </div>
-
-            <div className='col-md-6 right-box'>
-                <form onSubmit={login}>
-                    <div className='header-text mb-4 '>
-                        <h1>Sign In</h1>
-                    </div>
-                    <div className='input-group mb-3'>
-                        <input type='email' placeholder='Email' className='form-control form-contol-lg bg-light fs-6'
-                            onChange={e => setValues({ ...values, email: e.target.value })}>
-                        </input>
-                    </div>
-                    <div className='input-group mb-3'>
-                        <input type='password' placeholder='Password' className='form-control form-contol-lg bg-light fs-6'
-                            onChange={e => setValues({ ...values, password: e.target.value })}>
-                        </input>
-                    </div>
-                    <div className='input-group mb-5 d-flex justify-content-between'>
-                        <div className='form-check'>
-                            <input type='checkbox' className='form-check-input' />
-                            <label htmlFor='formcheck' className='form-check-label text-secondary'>
-                                <small>Remember me</small>
-                            </label>
-                        </div>
-                        <div className='forgot'>
-                            <small><a href='#'>Forgot Password?</a></small>
-                        </div>
-                    </div>
-                    <div className='input-group mb-3 justify-content-center'>
-                        <button className='btn border-white text-white w-50 fs-6'>Login</button>
-                    </div>
-                </form>
-            </div>
-
-            <div className='switch-content'>
-                <div className='switch'>
-                    <div className='switch-panel switch-left'>
-                        <h1>Hello, Again</h1>
-                        <p>We are happy to see you back</p>
-                        <button className='hidden btn border-white text-white w-50 fs-6' id='login' onClick={SwitchContent}>Login</button>
-                    </div>
-                    <div className='switch-panel switch-right'>
-                        <h1>Welcome</h1>
-                        <p>Join Our Unique Platform and Be The One, <br />
-                            To Explore a New Experience</p>
-                        <button className='hidden btn border-white text-white w-50 fs-6' id='register' onClick={SwitchContent}>Register</button>
-                    </div>
-                </div>
-            </div>
+            <button
+              type="submit"
+              className="w-full bg-[#6BBF59] hover:bg-green-600 text-white py-2 rounded font-semibold uppercase transition"
+            >
+              Login
+            </button>
+          </form>
         </div>
-    );
+
+        {/* Right side form */}
+        <div className={`w-1/2 p-10 flex flex-col justify-center transition-all duration-500 ease-in-out transform ${isRegistering ? "opacity-100 relative" : "translate-x-full opacity-0 absolute pointer-events-none"}`}>
+          <h2 className="text-3xl font-bold text-[#2F5233] mb-6">Create Account</h2>
+          <form onSubmit={handleRegister} className="space-y-4">
+            <input
+              type="text"
+              placeholder="Name"
+              className="w-full px-4 py-2 rounded bg-green-50 focus:outline-none"
+              onChange={(e) => setRegisterData({ ...registerData, username: e.target.value })}
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              className="w-full px-4 py-2 rounded bg-green-50 focus:outline-none"
+              onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              className="w-full px-4 py-2 rounded bg-green-50 focus:outline-none"
+              onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+            />
+            <button
+              type="submit"
+              className="w-full bg-[#6BBF59] hover:bg-green-600 text-white py-2 rounded font-semibold uppercase transition"
+            >
+              Register
+            </button>
+          </form>
+        </div>
+
+        {/* Side switch panel */}
+        <div className="w-1/2 bg-[#6BBF59] text-white flex flex-col justify-center items-center p-10 transition-all duration-500 ease-in-out">
+          {isRegistering ? (
+            <>
+              <h2 className="text-2xl font-bold mb-2">Hello Again 👋</h2>
+              <p className="text-center text-lg mb-4">We’re happy to see you back.</p>
+              <button
+                onClick={() => setIsRegistering(false)}
+                className="bg-white text-green-700 px-6 py-2 rounded font-semibold hover:bg-gray-100 transition"
+              >
+                Login
+              </button>
+            </>
+          ) : (
+            <>
+              <h2 className="text-2xl font-bold mb-2">Welcome to Worldpeas 🌱</h2>
+              <p className="text-center text-lg mb-4">Join our sustainable platform today!</p>
+              <button
+                onClick={() => setIsRegistering(true)}
+                className="bg-white text-green-700 px-6 py-2 rounded font-semibold hover:bg-gray-100 transition"
+              >
+                Register
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default LoginRegister;

@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container mx-auto px-6 grid md:grid-cols-3 gap-8">
         {/* Logo & Description */}
         <div>
-          <h2 className="text-2xl font-bold text-green-500">WorldPeas</h2>
+          <h2 className="text-2xl font-bold text-green-500">WorldPeas 🌱</h2>
           <p className="mt-3 text-lg">
           The WorldPeas features a vibrant and eco-friendly design that embodies sustainability, community, and agriculture. The logo includes a stylized globe integrated with pea pods or leaves, symbolizing global connectivity and eco-conscious farming. The typography is modern yet organic, using green and earthy tones to reflect growth, nature, and ethical trading. The design represents a marketplace where farmers and consumers connect to trade, sell, and donate produce responsibly.
           </p>
@@ -14,7 +14,7 @@ const Footer = () => {
         
         {/* Contact */}
         <div>
-          <h3 className="text-lg font-semibold text-green-400">Contact</h3>
+          <h3 className="text-lg font-semibold text-green-400">Contact Us</h3>
           <p className="mt-2 text-lg">Brgy. Tagbakin, Tiaong, Quezon</p>
           <p className="text-lg">Phone: 0905 192 7620</p>
           <p className="text-lg">Fax: +1 (2) 345 6789</p>
