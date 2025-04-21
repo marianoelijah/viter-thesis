@@ -1,28 +1,31 @@
-import React, { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import "./index.css";
-import App from "./App.jsx";
+// src/main.jsx
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
+import './index.css';
+import { BrowserRouter } from 'react-router-dom';
 
-createRoot(document.getElementById("root")).render(
+import { AuthContext } from './context/AuthContext'; // Adjust path if needed
+import { CartProvider } from '@/components/context/CartContext'; // Adjust path if needed
+
+// Auth Context Wrapper
+function AuthProviderWrapper({ children }) {
+  const [userId, setUserId] = useState(null); // Starts as null
+  return (
+    <AuthContext.Provider value={{ userId, setUserId }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-     <StrictMode>
-      <App />
-     </StrictMode>
+    <BrowserRouter>
+      <AuthProviderWrapper>
+        <CartProvider>
+          <App />
+        </CartProvider>
+      </AuthProviderWrapper>
+    </BrowserRouter>
   </React.StrictMode>
 );
-
-// src/main.jsx
-// import React from 'react';
-// import ReactDOM from 'react-dom/client';
-// import App from './App.jsx';
-// import { BrowserRouter } from 'react-router-dom';
-// import './index.css';
-
-// ReactDOM.createRoot(document.getElementById('root')).render(
-//   <React.StrictMode>
-//     <BrowserRouter>
-//       <App />
-//     </BrowserRouter>
-//   </React.StrictMode>
-// );
-

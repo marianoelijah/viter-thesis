@@ -15,7 +15,7 @@ const ProductCard = () => {
     <div className='bg-gray-600'>
       <section className='py-12 bg-white'>
         <div className='container mx-auto'>
-          <h2 className='text-3xl font-semibold text-center mb-8 pt-5'>Featured Products</h2>
+          <h2 className='text-4xl font-semibold text-center font-poppins mb-8 pt-5'>Featured Products</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6">
             {products.map((product) => (
               <div key={product.id} className='bg-gray-200 p-4 rounded-lg shadow-md hover:scale-105 transition'>

@@ -30,9 +30,11 @@ const Hero = () => {
             <ShoppingCart className="mr-2" size={20} /> Shop Now
           </Button>
           </Link>
+          <Link to="/home/about">
           <Button variant="outline" className="text-lime-600 border-lime-600 text-lg px-6 py-3 rounded-2xl">
             <Leaf className="mr-2" size={20} /> Learn More
           </Button>
+          </Link>
         </div>
       </motion.div>
 

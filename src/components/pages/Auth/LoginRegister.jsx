@@ -42,7 +42,7 @@ function LoginRegister() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F6F4EC] font-poppins transition-all duration-700">
+    <div className="min-h-screen flex items-center justify-center bg-[#2F5233] font-poppins transition-all duration-700">
       <div className="w-full max-w-4xl bg-white rounded-3xl shadow-lg overflow-hidden flex">
         {/* Left side form */}
         <div className={`w-1/2 p-10 flex flex-col justify-center transition-all duration-500 ease-in-out transform ${isRegistering ? "-translate-x-full opacity-0 absolute pointer-events-none" : "opacity-100 relative"}`}>

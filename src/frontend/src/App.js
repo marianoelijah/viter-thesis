@@ -1,6 +1,7 @@
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import LoginRegister from './LoginRegister';
 import Home from './Home';
+import Chatbot from './Chatbot';
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
         <Route path='/' element={<LoginRegister/>}></Route>
         <Route path='/register' element={<LoginRegister/>}></Route>
         <Route path='/home' element={<Home/>}></Route>
+        <Route path='/chatbot' element={<Chatbot/>}></Route>
        
 
 

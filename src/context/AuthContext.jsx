@@ -1,7 +1,8 @@
 import { createContext, useState, useEffect } from "react";
 
 // Create the authentication context
-export const AuthContext = createContext();
+export const AuthContext = createContext(null);
+// export const AuthContext = createContext();
 
 // AuthProvider component to manage authentication state
 export const AuthProvider = ({ children }) => {
@@ -28,6 +29,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("user");
   };
+
+
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>

@@ -1,54 +1,61 @@
-import React from "react";
-import { Link, NavLink } from "react-router-dom";
-import { imgPath } from '@/components/helpers/functions-general'
+import React, { useState } from "react";
+import { NavLink, Link } from "react-router-dom";
+import { ShoppingCart, Menu, X } from "lucide-react";
 
 const Header1 = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const toggleMenu = () => setIsOpen((prev) => !prev);
+  const closeMenu = () => setIsOpen(false);
+
   return (
-    <>
-      <div>
-        <header className="bg-green-500 w-full fixed">
-          <div className="container">
-            <div className="flex justify-between items-center p-2">
-              <div className="logo flex justify-between items-center gap-5">
-                <div className="flex gap-5">
-                </div>
-                <img
-                  src={`${imgPath}/logo.jpg`}
-                  alt=""
-                  className="h-[2px] w-[2px]"
-                />
-              </div>
-              <nav>
-                <ul className="navi flex gap-10 text-[20px] font-bold text-black">
-                <li>
-                    <NavLink to="home" className="hover:text-white">Home</NavLink>
-                  </li>
-                  <li>
-                    <NavLink to="about" className="hover:text-white">About</NavLink>
-                  </li>
-                  <li>
-                    <NavLink to="products" className="hover:text-white">Products</NavLink>
-                  </li>
-                  <li>
-                    <NavLink to="contacts" className="hover:text-white">Contacts</NavLink>
-                  </li>
-                  <li>
-                    <NavLink to="transactions" className="hover:text-white">Transactions</NavLink>
-                  </li>
-                </ul>
-              </nav>
-              
-              <Link to="/register">
-              <button className="text-white text-md font-semibold tracking-wider border border-white border-opacity-40 p-3 rounded-md hover:text-black hover:bg-white transition-all">
-                Join Now!
-              </button>
-              </Link>
-              
-            </div>
-          </div>
-        </header>
+    <header className="bg-green-500 w-full fixed z-50 shadow-md">
+      <div className="container mx-auto flex justify-between items-center p-4">
+        {/* Logo */}
+        <Link to="/home" className="text-white font-bold text-2xl hover:text-yellow-200">
+          🌱 Seedling
+        </Link>
+
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex gap-10 text-lg font-bold text-black">
+          <NavLink to="/home" className="hover:text-white">Home</NavLink>
+          <NavLink to="/about" className="hover:text-white">About</NavLink>
+          <NavLink to="/products" className="hover:text-white">Products</NavLink>
+          <NavLink to="/transactions" className="hover:text-white">Transactions</NavLink>
+          <NavLink to="/matching-trades" className="hover:text-white">Matching Trades</NavLink> {/* Added */}
+        </nav>
+
+        {/* Cart Icon */}
+        <Link to="/cart" className="relative hidden md:block">
+          <ShoppingCart className="w-6 h-6 text-white" />
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full">3</span>
+        </Link>
+
+        {/* Mobile Menu Button */}
+        <div className="md:hidden">
+          <button onClick={toggleMenu}>
+            {isOpen ? <X className="text-white" size={28} /> : <Menu className="text-white" size={28} />}
+          </button>
+        </div>
       </div>
-    </>
+
+      {/* Mobile Menu */}
+      {isOpen && (
+        <div className="md:hidden bg-green-500 px-6 pb-4">
+          <nav className="flex flex-col gap-4 text-lg font-bold font-poppins text-black">
+            <NavLink to="/home" onClick={closeMenu} className="hover:text-white">Home</NavLink>
+            <NavLink to="/about" onClick={closeMenu} className="hover:text-white">About</NavLink>
+            <NavLink to="/products" onClick={closeMenu} className="hover:text-white">Products</NavLink>
+            <NavLink to="/transactions" onClick={closeMenu} className="hover:text-white">Transactions</NavLink>
+            <NavLink to="/matching-trades" onClick={closeMenu} className="hover:text-white">Matching Trades</NavLink> {/* Added */}
+            <Link to="/cart" onClick={closeMenu} className="flex items-center gap-2 text-white">
+              <ShoppingCart className="w-5 h-5" />
+              <span>Cart</span>
+              <span className="bg-red-500 text-white text-xs px-1.5 rounded-full">3</span>
+            </Link>
+          </nav>
+        </div>
+      )}
+    </header>
   );
 };
 

@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { AuthContext } from "../../../../context/AuthContext";
+
 
 const Login2 = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { setUser } = useContext(AuthContext); // ✅ access setUser from context
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -18,6 +21,15 @@ const Login2 = () => {
       });
 
       if (response.data.Status === "Login successful") {
+        // ✅ Set the user in global context
+        const user = response.data.user;
+
+        setUser({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        });
+
         navigate("/home");
       } else {
         alert(response.data.Error);
@@ -66,6 +78,6 @@ const Login2 = () => {
       </div>
     </div>
   );
-}
+};
 
 export default Login2;

@@ -1,5 +1,8 @@
 export const imgPath = "http://localhost/viter-thesis/public/img";
 
+// export const imgPath = "http://localhost:3000/uploads";
+
+
 
 const urlThesisLocal = "http://localhost/viter-thesis"; //from thunder client
 

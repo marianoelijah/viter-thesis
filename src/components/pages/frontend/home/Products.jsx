@@ -18,6 +18,9 @@ const Products = () => {
     { id: 6, name: "Patatas", price: 55, category: "Vegetables", image: "patatas.jpg" },
     { id: 7, name: "Sitaw", price: 69, category: "Vegetables", image: "sitaw.jpg" },
     { id: 8, name: "Luya", price: 75, category: "Herbs & Spices", image: "luya.jpg" },
+    { id: 9, name: "Mango", price: 50, category: "Fruits", image: "mango.jpg" },
+    { id: 10, name: "Star Apple", price: 50, category: "Fruits", image: "starapple.jpg" },
+    { id: 11, name: "Orange", price: 50, category: "Fruits", image: "orange.jpg" },
   ];
 
   const categories = ["All", "Fruits", "Vegetables", "Grains", "Herbs & Spices"];
@@ -28,18 +31,31 @@ const Products = () => {
   }, []);
 
   const addToCart = (product) => {
-    const updatedCart = [...cart, product];
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-
+    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+  
+    const existingProductIndex = storedCart.findIndex(
+      (item) => item.id === product.id
+    );
+  
+    if (existingProductIndex !== -1) {
+      // Product already exists in cart - update quantity
+      storedCart[existingProductIndex].quantity += 1;
+    } else {
+      // Product not in cart - add with quantity = 1
+      storedCart.push({ ...product, quantity: 1 });
+    }
+  
+    setCart(storedCart);
+    localStorage.setItem("cart", JSON.stringify(storedCart));
+  
     // Show notification
     setNotification(`${product.name} added to cart!`);
     setTimeout(() => setNotification(null), 2000);
-
-    // Redirect to Inventory (where users can manage their cart)
-    setTimeout(() => navigate("/inventory"), 1500);
+  
+    // Optional redirect after a delay
+    setTimeout(() => navigate("/cart"), 1500); // Or "/cart" if that's the route
   };
-
+  
   const filteredProducts = products.filter(
     (product) =>
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
@@ -55,7 +71,7 @@ const Products = () => {
       )}
 
       {/* Page Title */}
-      <h1 className="text-4xl font-semibold text-center mb-6">Categories</h1>
+      <h1 className="text-4xl font-semibold font-poppins text-center mb-6">Categories</h1>
 
       {/* Search & Filter Section */}
       <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-md shadow-md mb-6">
