@@ -17,7 +17,8 @@ import Confirmation from "./components/pages/frontend/home/Confirmation";
 import Type from "./components/pages/frontend/home/Type";
 import Orders from "./components/pages/frontend/home/Orders";
 import MatchingTrades from "./components/pages/frontend/Trades/MatchingTrades";
-import Transactions from "./components/pages/frontend/Trades/Transactions";
+import Trade from "./components/pages/frontend/Trades/Trade";
+import Donate from "./components/pages/frontend/Trades/Donate";
 
 const App = () => {
   const [cart, setCart] = useState([]);
@@ -32,9 +33,10 @@ const App = () => {
             <Route path="/home" element={<Homepage />} />
             <Route path="/home/about" element={<About />} />
             <Route path="/home/products" element={<Productss />} />
-            <Route path="/home/productss" element={<Productss />} />
-            {/* <Route path="/home/contacts" element={<Contacts />} /> */}
-            <Route path="/home/transactions" element={<Transactions />} />
+            <Route path="/home/trade" element={<Trade />} />
+            <Route path="/home/donate" element={<Donate />} />
+
+
            
             <Route path="/login2" element={<Login2 />} />
             <Route path="/register" element={<LoginRegister />} />

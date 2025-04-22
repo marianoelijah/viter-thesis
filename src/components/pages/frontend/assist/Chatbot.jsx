@@ -6,7 +6,7 @@ const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState([
-    { sender: 'bot', text: "Hello! Ask me anything about Worldpeas 🌱" },
+    { sender: 'bot', text: "Hello! Ask me anything about Seedling 🌱" },
   ]);
   const [input, setInput] = useState('');
 
@@ -62,7 +62,7 @@ const Chatbot = () => {
             className="bg-white w-80 h-[28rem] p-4 mt-4 rounded-2xl shadow-2xl flex flex-col"
           >
             <div className="flex justify-between items-center mb-2">
-              <h2 className="font-bold text-lg text-green-700">Worldpeas Assistant</h2>
+              <h2 className="font-bold text-lg text-green-700">Seedling Assistant</h2>
               <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-gray-600">✖️</button>
             </div>
 

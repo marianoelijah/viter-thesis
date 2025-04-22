@@ -18,10 +18,12 @@ const Header1 = () => {
         {/* Desktop Nav */}
         <nav className="hidden md:flex gap-10 text-lg font-bold text-black">
           <NavLink to="/home" className="hover:text-white">Home</NavLink>
-          <NavLink to="/about" className="hover:text-white">About</NavLink>
-          <NavLink to="/products" className="hover:text-white">Products</NavLink>
-          <NavLink to="/transactions" className="hover:text-white">Transactions</NavLink>
-          <NavLink to="/matching-trades" className="hover:text-white">Matching Trades</NavLink> {/* Added */}
+          <NavLink to="/home/about" className="hover:text-white">About</NavLink>
+          <NavLink to="/home/products" className="hover:text-white">Products</NavLink>
+          <NavLink to="/home/trade" className="hover:text-white">Trade</NavLink>
+          <NavLink to="/home/donate" className="hover:text-white">Donate</NavLink>
+
+         
         </nav>
 
         {/* Cart Icon */}
@@ -43,10 +45,13 @@ const Header1 = () => {
         <div className="md:hidden bg-green-500 px-6 pb-4">
           <nav className="flex flex-col gap-4 text-lg font-bold font-poppins text-black">
             <NavLink to="/home" onClick={closeMenu} className="hover:text-white">Home</NavLink>
-            <NavLink to="/about" onClick={closeMenu} className="hover:text-white">About</NavLink>
-            <NavLink to="/products" onClick={closeMenu} className="hover:text-white">Products</NavLink>
-            <NavLink to="/transactions" onClick={closeMenu} className="hover:text-white">Transactions</NavLink>
-            <NavLink to="/matching-trades" onClick={closeMenu} className="hover:text-white">Matching Trades</NavLink> {/* Added */}
+            <NavLink to="/home/about" onClick={closeMenu} className="hover:text-white">About</NavLink>
+            <NavLink to="/home/products" onClick={closeMenu} className="hover:text-white">Products</NavLink>
+            <NavLink to="/home/trade" onClick={closeMenu} className="hover:text-white">Trade</NavLink>
+            <NavLink to="/home/donate" onClick={closeMenu} className="hover:text-white">Donate</NavLink>
+
+
+           
             <Link to="/cart" onClick={closeMenu} className="flex items-center gap-2 text-white">
               <ShoppingCart className="w-5 h-5" />
               <span>Cart</span>
