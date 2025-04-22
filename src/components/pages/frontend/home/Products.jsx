@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useContext } from "react";
+import { CartContext } from '@/components/context/CartContext';
 import { useNavigate } from "react-router-dom";
 import { imgPath } from "@/components/helpers/functions-general";
 
 const Products = () => {
-  const [cart, setCart] = useState([]);
+  const { cartItems, addToCart, removeFromCart, getTotal } = useContext(CartContext); 
   const [notification, setNotification] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const navigate = useNavigate();
 
-  // ✅ Updated full product list
+  // Full product list
   const products = [
     { id: 1, name: "Papaya", price: 50, category: "Fruits", image: "papaya.jpg" },
     { id: 2, name: "Carrots", price: 45, category: "Vegetables", image: "carrots.jpg" },
@@ -32,28 +33,21 @@ const Products = () => {
     { id: 19, name: "Atis", price: 38, category: "Fruits", image: "atis.jpg" },
   ];
 
-  // ✅ Generate categories dynamically
   const categories = ["All", ...new Set(products.map(p => p.category))];
 
-  useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(storedCart);
-  }, []);
-
-  const addToCart = (product) => {
-    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-
-    const existing = storedCart.find(item => item.id === product.id);
-    if (existing) {
-      existing.quantity += 1;
-    } else {
-      storedCart.push({ ...product, quantity: 1 });
-    }
-
-    localStorage.setItem("cart", JSON.stringify(storedCart));
-    setCart(storedCart);
+  const handleAddToCart = (product) => {
+    addToCart(product);
     setNotification(`${product.name} added to cart!`);
     setTimeout(() => setNotification(null), 2000);
+  };
+
+  const handleBuyNow = (product) => {
+    const cartItems = [{ ...product, quantity: 1 }];
+    const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+    navigate("/cashout", {
+      state: { cartItems, subtotal },
+    });
   };
 
   const filteredProducts = products.filter(
@@ -107,13 +101,13 @@ const Products = () => {
               <p className="text-green-600 font-bold mb-2">₱{product.price.toFixed(2)}</p>
               <div className="flex gap-2">
                 <button
-                  onClick={() => addToCart(product)}
+                  onClick={() => handleAddToCart(product)}
                   className="flex-1 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
                 >
                   Add to Cart
                 </button>
                 <button
-                  onClick={() => navigate(`/product/${product.id}`)}
+                  onClick={() => handleBuyNow(product)}
                   className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
                 >
                   Buy Now
