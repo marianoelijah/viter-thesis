@@ -30,7 +30,6 @@ const db = mysql.createPool({
 // Recommendation API from python
 import axios from 'axios'; // Correct for ES Modules
 
-
 async function getRecommendations(userEncoded) {
     try {
         const response = await axios.post('http://192.168.114.67:5000/recommend', {
@@ -70,7 +69,6 @@ app.get('/', (req, res) => res.send('CORS is enabled!'));
 // Mount routers
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
-app.use('/products', productsRoutes);  // Optional, maybe duplicate
 app.use('/api/tradecart', tradeCartRoutes);
 app.use('/api/trade', tradeRoutes);
 app.use('/api', tradeRoutes); // ✅ Mounts it correctly

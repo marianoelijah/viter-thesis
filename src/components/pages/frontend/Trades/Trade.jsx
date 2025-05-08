@@ -157,6 +157,10 @@ const Trade = () => {
     }
   };
   
+  const handleTrade = () => {
+    localStorage.setItem("tradedProduct", JSON.stringify(product));
+    navigate("/cashout-trade");
+  };
 
   return (
     <div className="min-h-screen bg-green-100 p-6 relative">
@@ -244,15 +248,11 @@ const Trade = () => {
                 Add to Cart
               </button>
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleTradeNow(product);
-                  console.log(`Trading ${product.name}`);
-                }}
-                className="w-full mt-2 bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none"
-              >
-                Trade Now
-              </button>
+        onClick={handleTrade}
+        className="bg-blue-600 text-white px-4 py-2 rounded mt-4"
+      >
+        Trade Now
+      </button>
             </div>
           ))
         ) : (
@@ -290,7 +290,7 @@ const Trade = () => {
               </button>
             </div>
             {/* Recommended Products Section */}
-            <h3 className="text-xl font-bold mb-4">Recommended Products:</h3>
+      <h3 className="text-xl font-bold mb-4">Recommended Products:</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {getRecommendedProducts().map((rec) => (
             <div

@@ -5,40 +5,41 @@ import { v4 as uuidv4 } from 'uuid';
 const router = express.Router();
 
 // Create a new order
-router.post("/api/orders2", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
-    console.log("📦 Incoming order payload:", req.body); 
+    console.log("📦 Incoming order payload:", req.body);
+
     const {
-      fullName,
-      email,
-      phone,
-      address,
-      city,
-      postalCode,
-      notes,
-      paymentMethod,
-    } = req.body.userDetails;
+      userDetails: {
+        fullName,
+        email,
+        phone,
+        address,
+        city,
+        postalCode,
+        notes,
+        paymentMethod,
+      },
+      subtotal,
+      tax,
+      total,
+      items,
+    } = req.body;
     
 
-    const full_name = fullName;
-    const postal_code = postalCode;
-    const payment_method = paymentMethod;
-    const { subtotal, tax, total, items } = req.body;
-
-    // Insert into orders2
     const [result] = await db.query(
       `INSERT INTO orders2 
         (full_name, email, phone, address, city, postal_code, notes, payment_method, subtotal, tax, total) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        full_name,
+        fullName,
         email,
         phone,
         address,
         city,
-        postal_code,
+        postalCode,
         notes,
-        payment_method,
+        paymentMethod,
         subtotal,
         tax,
         total,
@@ -47,12 +48,14 @@ router.post("/api/orders2", async (req, res) => {
 
     const orderId = result.insertId;
 
+    // Insert each order item
     for (const item of items) {
       await db.query(
-        `INSERT INTO order_items (order_id, product_id, quantity, price) 
-         VALUES (?, ?, ?, ?)`,
-        [orderId, item.id, item.quantity, item.price]
+        `INSERT INTO order_items (order_id, product_id, product_name, quantity, price) 
+         VALUES (?, ?, ?, ?, ?)`,
+        [orderId, item.id, item.name, item.quantity, item.price]
       );
+      
     }
 
     res.status(201).json({
@@ -64,5 +67,6 @@ router.post("/api/orders2", async (req, res) => {
     res.status(500).json({ error: "Failed to place order" });
   }
 });
+
 
 export default router;

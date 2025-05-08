@@ -53,16 +53,19 @@ const Cart = () => {
   //   }
   // };
   const handleProceedToCheckout = () => {
-    const orderSummary = cartItems.map(item => ({
+    const orderSummary = cart.map(item => ({
       id: item.id,
       name: item.name,
       quantity: item.quantity,
       price: item.price,
       total: item.quantity * item.price,
     }));
-
-    navigate("/cashout2", {
-      state: { orderSummary },
+  
+    navigate("/cashout", {
+      state: {
+        orderSummary,
+        totalAmount, // pass total too
+      },
     });
   };
 

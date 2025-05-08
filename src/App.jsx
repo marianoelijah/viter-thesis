@@ -11,9 +11,6 @@ import { AuthProvider } from "./context/AuthContext";
 import Cart from "./components/pages/frontend/home/Cart";
 import Cashout from "./components/pages/frontend/home/Cashout";
 import Confirmation from "./components/pages/frontend/home/Confirmation";
-import Type from "./components/pages/frontend/home/Type";
-import Orders from "./components/pages/frontend/home/Orders";
-import MatchingTrades from "./components/pages/frontend/Trades/MatchingTrades";
 import Trade from './components/pages/frontend/Trades/Trade'; // ✅ Correct for default export
 import Donate from "./components/pages/frontend/Trades/Donate";
 import Login from "./components/pages/frontend/authentication/Login";
@@ -34,6 +31,8 @@ import TradeOffers from "./components/pages/frontend/sellerInterface/TradeOffers
 import Cashout2 from "./components/pages/frontend/Trades/Cashout2"
 import TradeCart from "./components/pages/frontend/Trades/TradeCart";
 import UploadDonationForm from "./components/pages/frontend/Trades/UploadDonationForm";
+import { Toaster } from 'react-hot-toast';
+import CashoutTrade from "./components/pages/frontend/Trades/CashoutTrade";
 
 
 
@@ -46,6 +45,7 @@ const App = () => {
       <AuthProvider>
         <StoreProvider>
         
+        <Toaster position="top-right" />
           <Routes>
             <Route index element={<Welcome />} />
             <Route path="/home" element={<Homepage />} />
@@ -57,9 +57,6 @@ const App = () => {
             <Route path="/cart" element={<Cart />} />
             <Route path="/cashout" element={<Cashout />} />
             <Route path="/confirmation" element={<Confirmation />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/type" element={<Type />} />
-            <Route path="/matching-trades" element={<MatchingTrades />} />
 
             {/* authentication */}
             <Route path="/login" element={<Login />} />
@@ -71,6 +68,7 @@ const App = () => {
             <Route path="/cashout2" element={<Cashout2 />} />
             <Route path="/tradecart" element={<TradeCart />} />
             <Route path="/donationform" element={<UploadDonationForm />} />
+            <Route path="/cashout-trade" element={<CashoutTrade />} />
 
 
             {/* seler-interface */}

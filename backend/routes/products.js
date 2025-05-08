@@ -100,6 +100,55 @@ router.put('/:id/decrease-stock', async (req, res) => {
   }
 });
 
+/** ✅ Product Delete route in MyProduct.jsx */
+router.delete('/:id', (req, res) => {
+  const productsId = req.params.id;
+
+  db.query('DELETE FROM products WHERE id = ?', [productsId], (err, result) => {
+    if (err) {
+      console.error('Delete error:', err);
+      return res.status(500).json({ error: 'Server error while deleting product' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    res.status(200).json({ message: 'Product deleted successfully' });
+  });
+});
+
+// Product Edit route in MyProduct.jsx */
+// This route is used to update product details
+router.put('/:id', async (req, res) => {
+  const productId = req.params.id;
+  const { name, price, description, category, availableStock, quantity } = req.body;
+
+  const sql = `
+    UPDATE products
+    SET name = ?, price = ?, description = ?, category = ?, availableStock = ?, quantity = ?
+    WHERE id = ?
+  `;
+
+  console.log("Update request body:", req.body);
+  console.log("Values:", name, price, description, category, availableStock, quantity, productId);
+
+  try {
+    const [result] = await db.execute(sql, [name, price, description, category, availableStock, quantity, productId]);
+    res.status(200).json({ message: 'Product updated successfully' });
+  } catch (err) {
+    console.error('SQL error:', err);
+    res.status(500).json({ message: 'Database update failed' });
+  }
+});
+
+//** ✅ Product Update route in MyProduct.jsx */
+
+
+
+
+
+
 
 
 
