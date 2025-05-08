@@ -1,18 +1,15 @@
-import mysql from 'mysql2';
+// config/db.js
+import mysql from 'mysql2/promise';
 
-const db = mysql.createConnection({
+const db = mysql.createPool({
   host: 'localhost',
   user: 'root',
-  password: '', // or your password
-  database: 'worldpeas_v2',
-});
-
-db.connect((err) => {
-  if (err) {
-    console.error('❌ DB connection failed:', err);
-    return;
-  }
-  console.log('✅ Connected to MySQL DB');
+  password: '',
+  database: 'seedling_db',
+  port: 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
 export default db;

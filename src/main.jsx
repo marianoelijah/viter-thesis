@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 import { BrowserRouter } from 'react-router-dom';
-
+import { Toaster } from 'react-hot-toast';
 import { AuthContext } from './context/AuthContext'; // Adjust path if needed
 import { CartProvider } from '@/components/context/CartContext'; // Adjust path if needed
 
@@ -24,6 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <AuthProviderWrapper>
         <CartProvider>
           <App />
+          <Toaster position="top-right" reverseOrder={false} />
         </CartProvider>
       </AuthProviderWrapper>
     </BrowserRouter>

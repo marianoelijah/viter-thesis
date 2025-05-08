@@ -1,182 +1,199 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+// import { useCart } from "../../../context/CartContext"; // Adjust the import path as necessary
 
 const Cashout = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  // Get dynamic cart data from location.state
-  const cartItems = location.state?.cartItems || [];
-  const subtotal = location.state?.subtotal || 0;
-  const taxRate = 0.05;
-  const tax = subtotal * taxRate;
-  const total = subtotal + tax;
-
   const [formData, setFormData] = useState({
-    fullName: "",
+    full_name: "",
     email: "",
     phone: "",
     address: "",
     city: "",
-    postalCode: "",
-    paymentMethod: "cod",
+    postal_code: "",
+    notes: "",
+    payment_method: "Cash on Delivery",
   });
+
+  const [cartItems, setCartItems] = useState([]);
+  const [subtotal, setSubtotal] = useState(0);
+  const tax = 0;
+  const total = subtotal + tax;
+  const { cart, clearCart } = useCart();
+  const navigate = useNavigate();
+
+  const handlePurchase = async (productId, quantity) => {
+    try {
+      await axios.put(`http://localhost:3000/api/products/${productId}/decrease-stock`, {
+        quantity,
+      });
+      toast.success("Stock updated after purchase!");
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to update stock.");
+    }
+  };
+  
+
+  useEffect(() => {
+    const items = JSON.parse(localStorage.getItem("cart")) || [];
+    setCartItems(items);
+    const calculatedSubtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    setSubtotal(calculatedSubtotal);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Create the order data structure
-    const orderData = {
-      items: cartItems,  // Add cartItems data here
-      subtotal: subtotal,
-      taxRate: taxRate,
-      total: subtotal * (1 + taxRate),
-    };
-  
-    // Store it in local storage (or send to backend)
-    const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
-    storedOrders.push(orderData);
-    localStorage.setItem("orders", JSON.stringify(storedOrders));
-  
-    // Navigate to confirmation page
-    navigate("/confirmation");
+  const handleCheckout = async () => {
+    try {
+      for (const item of cart) {
+        await axios.put(`http://localhost:3000/api/products/${item.id}/decrease-stock`, {
+          quantity: item.quantity,
+        });
+      }
+
+      toast.success("Order placed and stock updated!");
+      clearCart();
+      navigate('/confirmation'); // or wherever your success page is
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Checkout failed.");
+    }
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    try {
+      const orderPayload = {
+        fullName: formData.full_name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        postalCode: formData.postal_code,
+        notes: formData.notes,
+        paymentMethod: formData.payment_method,
+        items: cartItems.map((item) => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        subtotal,
+        tax,
+        total,
+      };
+      
+  
+      const response = await axios.post("http://localhost:3000/api/orders2", orderPayload);
+      console.log("Order response:", response.data);
+      alert("Order placed successfully!");
+    } catch (error) {
+      console.error("Order error:", error.response?.data || error.message);
+      alert("Failed to place order.");
+    }
+  };
+  
   
 
   return (
-    <div className="max-w-6xl mx-auto p-4 mt-6">
-      <h2 className="text-2xl font-bold mb-4">Checkout</h2>
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-3 gap-6"
-      >
-        {/* Billing & Shipping Form */}
-        <div className="md:col-span-2 space-y-4">
-          <h3 className="text-xl font-semibold mb-2">Shipping Information</h3>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-2xl bg-white shadow-xl rounded-2xl p-8">
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Checkout</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Inputs Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
-              type="text"
-              name="fullName"
+              name="full_name"
+              onChange={handleChange}
               placeholder="Full Name"
-              value={formData.fullName}
-              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
-              className="border rounded p-2 w-full"
             />
             <input
-              type="email"
               name="email"
+              onChange={handleChange}
               placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
-              className="border rounded p-2 w-full"
             />
             <input
-              type="tel"
               name="phone"
-              placeholder="Phone Number"
-              value={formData.phone}
               onChange={handleChange}
+              placeholder="Phone"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
-              className="border rounded p-2 w-full"
             />
             <input
-              type="text"
-              name="city"
-              placeholder="City"
-              value={formData.city}
+              name="postal_code"
               onChange={handleChange}
+              placeholder="Postal Code"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
-              className="border rounded p-2 w-full"
+            />
+            <input
+              name="city"
+              onChange={handleChange}
+              placeholder="City"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
+            />
+            <input
+              name="address"
+              onChange={handleChange}
+              placeholder="Address"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
             />
           </div>
-          <input
-            type="text"
-            name="address"
-            placeholder="Full Address"
-            value={formData.address}
+
+          {/* Notes Field */}
+          <textarea
+            name="notes"
             onChange={handleChange}
-            required
-            className="border rounded p-2 w-full"
-          />
-          <input
-            type="text"
-            name="postalCode"
-            placeholder="Postal Code"
-            value={formData.postalCode}
-            onChange={handleChange}
-            required
-            className="border rounded p-2 w-full"
+            placeholder="Additional Notes"
+            rows={3}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
 
-          <h3 className="text-xl font-semibold mt-6">Payment Method</h3>
-          <div className="space-y-2">
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="cod"
-                checked={formData.paymentMethod === "cod"}
-                onChange={handleChange}
-              />
-              Cash on Delivery (COD)
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="card"
-                checked={formData.paymentMethod === "card"}
-                onChange={handleChange}
-              />
-              Credit/Debit Card
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="upi"
-                checked={formData.paymentMethod === "upi"}
-                onChange={handleChange}
-              />
-              UPI / GCash / PayMaya
-            </label>
+          {/* Payment Method */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+            <select
+              name="payment_method"
+              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              <option value="Cash on Delivery">Cash on Delivery</option>
+              {/* More payment options can be added here */}
+            </select>
           </div>
-        </div>
 
-        {/* Dynamic Order Summary */}
-        <div className="border rounded-xl p-4 shadow-md bg-white h-fit">
-          <h3 className="text-xl font-bold mb-4">Order Summary</h3>
-          <div className="flex justify-between mb-2">
-            <span>Subtotal:</span>
-            <span>₱{subtotal.toFixed(2)}</span>
+          {/* Order Summary */}
+          <div className="border-t pt-4 text-gray-700">
+            <div className="flex justify-between text-sm">
+              <span>Subtotal:</span>
+              <span>₱{subtotal.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Tax:</span>
+              <span>₱{tax.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-lg font-semibold text-gray-900 mt-2">
+              <span>Total:</span>
+              <span>₱{total.toFixed(2)}</span>
+            </div>
           </div>
-          <div className="flex justify-between mb-2">
-            <span>Tax (5%):</span>
-            <span>₱{tax.toFixed(2)}</span>
-          </div>
-          <hr className="my-2" />
-          <div className="flex justify-between font-bold text-lg">
-            <span>Total:</span>
-            <span>₱{total.toFixed(2)}</span>
-          </div>
-          <button
-            type="submit"
-            className="mt-6 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
-          >
-            Place Order
-          </button>
-        </div>
-      </form>
+
+          {/* Submit Button */}
+          <button onClick={handleCheckout} className="bg-green-500 text-white px-4 py-2 rounded">
+        Confirm & Pay
+           </button>
+        </form>
+      </div>
     </div>
   );
 };

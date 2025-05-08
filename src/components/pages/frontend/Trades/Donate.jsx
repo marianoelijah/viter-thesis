@@ -1,133 +1,206 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { ArrowLeft, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { ArrowLeft, HeartHandshake } from "lucide-react";
 
-const Donate = () => {
-  const [donation, setDonation] = useState({ name: "", quantity: "", notes: "" });
-  const [donationList, setDonationList] = useState([]);
+export default function Donate() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [category, setCategory] = useState("All");
+  const [recommended, setRecommended] = useState([]);
+  const [donateProducts, setDonateProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // Fetch donation products
   useEffect(() => {
-    fetch("http://localhost:3000/api/donations")
-      .then((res) => res.json())
-      .then((data) => setDonationList(data))
-      .catch((err) => console.error("Failed to fetch donations:", err));
-
-    const stored = localStorage.getItem("donations");
-    if (stored) setDonationList(JSON.parse(stored));
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/products");
+        const data = await res.json();
+        setDonateProducts(data);
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError("Failed to load products. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
   }, []);
 
-  const handleDonationChange = (e) => {
-    const { name, value } = e.target;
-    setDonation((prev) => ({ ...prev, [name]: value }));
-  };
+  // Fetch recommendations based on user_encoded (example: 10)
+  useEffect(() => {
+    if (donateProducts.length === 0) return;
 
-  const handleDonationSubmit = async (e) => {
-    e.preventDefault();
+    const fetchRecommendations = async () => {
+      try {
+        const res = await fetch("http://192.168.114.67:5000/recommend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_encoded: 10 }),
+        });
 
-    if (!donation.name || !donation.quantity) {
-      toast.error("Please fill out all required fields.");
-      return;
-    }
-
-    const newDonation = {
-      ...donation,
-      date: new Date().toLocaleString(),
+        const data = await res.json();
+        if (data.recommended_product_ids) {
+          const recommendedItems = data.recommended_product_ids
+            .map((id) => donateProducts.find((p) => p.id === id || p.id === Number(id)))
+            .filter(Boolean);
+          setRecommended(recommendedItems);
+        }
+      } catch (err) {
+        console.error("Recommendation error:", err);
+      }
     };
 
+    fetchRecommendations();
+  }, [donateProducts]);
+
+  const filteredProducts = donateProducts.filter(
+    (product) =>
+      (category === "All" || product.category === category) &&
+      product.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleRequest = async (product) => {
     try {
-      const res = await fetch("http://localhost:3000/api/donations", {
+      const res = await fetch("http://localhost:3000/api/donation-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newDonation),
+        body: JSON.stringify({
+          productName: product.name,
+          donor: product.donorName,
+          dateRequested: new Date().toISOString(),
+          userId: 1, // Replace with actual user ID
+        }),
       });
 
-      if (!res.ok) throw new Error("Failed to save donation");
-
-      toast.success(`Donation saved: ${donation.name}`);
-      const updatedList = [newDonation, ...donationList];
-      setDonationList(updatedList);
-      localStorage.setItem("donations", JSON.stringify(updatedList));
-      setDonation({ name: "", quantity: "", notes: "" });
+      const data = await res.json();
+      if (res.ok) {
+        alert("Your request was successfully submitted!");
+      } else {
+        alert(`Error: ${data.message}`);
+      }
     } catch (err) {
-      toast.error("Error saving donation.");
-      console.error(err);
+      console.error("Request failed:", err);
+      alert("An error occurred while submitting your request.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-white to-yellow-200 flex justify-center items-center px-4 py-10">
-      <div className="w-full max-w-lg bg-white/90 backdrop-blur-lg border border-yellow-200 shadow-xl rounded-2xl p-8 relative">
-
-        {/* Back button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 flex items-center text-gray-600 hover:text-yellow-600 transition"
-        >
-          <ArrowLeft className="w-5 h-5 mr-1" />
-          <span className="text-sm font-medium">Back</span>
+    <div className="p-4 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="mb-6 flex items-center justify-between">
+        <button onClick={() => navigate(-1)} className="flex items-center text-gray-600 hover:text-green-600">
+          <ArrowLeft className="mr-2" /> Back
         </button>
-
-        {/* Header */}
-        <div className="flex items-center gap-2 justify-center mb-6">
-          <HeartHandshake className="text-yellow-500 w-6 h-6" />
-          <h3 className="text-2xl font-bold text-gray-800">Donate Your Products</h3>
-        </div>
-
-        {/* Donation Form */}
-        <form onSubmit={handleDonationSubmit} className="space-y-4">
-          <input
-            type="text"
-            name="name"
-            placeholder="Product Name"
-            value={donation.name}
-            onChange={handleDonationChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            required
-          />
-          <input
-            type="text"
-            name="quantity"
-            placeholder="Quantity"
-            value={donation.quantity}
-            onChange={handleDonationChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            required
-          />
-          <textarea
-            name="notes"
-            placeholder="Additional Notes"
-            value={donation.notes}
-            onChange={handleDonationChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-          ></textarea>
-          <button
-            type="submit"
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded-lg transition duration-200"
-          >
-            Donate
-          </button>
-        </form>
-
-        {/* Donation History */}
-        {donationList.length > 0 && (
-          <div className="mt-8 bg-white border border-yellow-100 rounded-xl p-4 shadow-inner max-h-60 overflow-y-auto">
-            <h4 className="font-semibold text-lg mb-2 text-gray-700">Your Donation History</h4>
-            <ul className="space-y-3">
-              {donationList.map((don, index) => (
-                <li key={index} className="border-b border-gray-200 pb-2">
-                  <p><strong>{don.name}</strong> - {don.quantity}</p>
-                  {don.notes && <p className="text-sm text-gray-500">{don.notes}</p>}
-                  <p className="text-xs text-gray-400 italic">{don.date}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <h1 className="text-4xl font-bold text-gray-900 mb-4 text-center md:text-left">🧺 Donate Products</h1>
       </div>
+
+      {/* Search & Filter */}
+      <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+        <input
+          type="text"
+          placeholder="🔍 Search by product name..."
+          className="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <select
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option value="All">All Categories</option>
+          <option value="Leafy">Leafy</option>
+          <option value="Root Crops">Root Crops</option>
+          <option value="Fruits">Fruits</option>
+          <option value="Others">Others</option>
+        </select>
+      </div>
+
+      {/* Loading & Error */}
+      {loading && <p className="text-gray-600 text-center">Loading donated products...</p>}
+      {error && <p className="text-red-500 text-center">{error}</p>}
+
+      {/* Product Grid */}
+      {!loading && !error && filteredProducts.length === 0 && (
+        <p className="text-gray-500 text-center">No products found.</p>
+      )}
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        {filteredProducts.map((product) => (
+          <div
+            key={product.id}
+            onClick={() => setSelectedProduct(product)}
+            className="bg-green-300 rounded-xl shadow hover:shadow-lg transition duration-300 cursor-pointer p-4 text-center border hover:border-green-500"
+          >
+            <img
+              src={`http://localhost:3000/uploads/${product.image}`}
+              alt={product.name}
+              className="h-48 w-full object-cover rounded-lg mb-4 transform transition-all duration-200 hover:scale-110"
+            />
+            <h2 className="font-semibold mt-2 text-lg">{product.name}</h2>
+            <p className="text-sm text-gray-700">Donor: {product.donorName}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Modal */}
+      {selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md relative">
+            <button
+              className="absolute top-3 right-3 text-gray-600 hover:text-red-600"
+              onClick={() => setSelectedProduct(null)}
+            >
+              <X />
+            </button>
+            <img
+              src={`http://localhost:3000/uploads/${selectedProduct.image}`}
+              alt={selectedProduct.name}
+              className="w-full h-60 object-cover rounded-lg mb-4"
+            />
+            <h2 className="text-2xl font-bold mb-2">{selectedProduct.name}</h2>
+            <p className="text-sm text-gray-700 mb-1">📦 Quantity: {selectedProduct.quantity}</p>
+            <p className="text-sm text-gray-700 mb-1">🗓️ Donated on: {selectedProduct.date}</p>
+            <p className="text-sm text-gray-700 mb-1">👤 Donor: {selectedProduct.donorName}</p>
+            {selectedProduct.notes && (
+              <p className="text-sm text-gray-700 mb-2">📝 Notes: {selectedProduct.notes}</p>
+            )}
+            <button
+              className="mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg"
+              onClick={() => handleRequest(selectedProduct)}
+            >
+              Request Donation
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Recommended Section */}
+      {recommended.length > 0 && (
+        <div className="mt-10">
+          <h2 className="text-2xl font-bold mb-4 text-green-700">✨ Recommended For You</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {recommended.map((product) => (
+              <div
+                key={product.id}
+                onClick={() => setSelectedProduct(product)}
+                className="bg-yellow-100 rounded-xl shadow hover:shadow-lg transition duration-300 cursor-pointer p-4 text-center border hover:border-yellow-400"
+              >
+                <img
+                  src={`http://localhost:3000/uploads/${product.image}`}
+                  alt={product.name}
+                  className="h-48 w-full object-cover rounded-lg mb-4 transform transition-all duration-200 hover:scale-105"
+                />
+                <h3 className="font-semibold text-lg">{product.name}</h3>
+                <p className="text-sm text-gray-600">Donor: {product.donorName}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
-};
-
-export default Donate;
+}

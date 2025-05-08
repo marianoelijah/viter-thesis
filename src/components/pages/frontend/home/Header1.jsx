@@ -1,17 +1,22 @@
 import React, { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
-import { ShoppingCart, Menu, X } from "lucide-react";
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import { ShoppingCart, Menu, X, User } from "lucide-react";
 
 const Header1 = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => setIsOpen((prev) => !prev);
   const closeMenu = () => setIsOpen(false);
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
 
   return (
     <header className="bg-green-500 w-full fixed z-50 shadow-md">
       <div className="container mx-auto flex justify-between items-center p-4">
         {/* Logo */}
-        <Link to="/home" className="text-white font-bold text-2xl hover:text-yellow-200">
+        <Link to="/userinterface" className="text-white font-bold text-2xl hover:text-yellow-200">
           🌱 Seedling
         </Link>
 
@@ -19,12 +24,25 @@ const Header1 = () => {
         <nav className="hidden md:flex gap-10 text-lg font-bold text-black">
           <NavLink to="/home" className="hover:text-white">Home</NavLink>
           <NavLink to="/home/about" className="hover:text-white">About</NavLink>
-          <NavLink to="/home/products" className="hover:text-white">Products</NavLink>
+          <NavLink to="/buyerpage" className="hover:text-white">Buy</NavLink>
           <NavLink to="/home/trade" className="hover:text-white">Trade</NavLink>
           <NavLink to="/home/donate" className="hover:text-white">Donate</NavLink>
-
-         
         </nav>
+
+              {/* User Profile & Cart Icon */}
+                <div className="flex items-center gap-4">
+                  {/* Profile Icon */}
+                  <Link to="/seller/profile">
+                    <User className="w-6 h-6 text-white" />
+                  </Link>
+                  {/* Logout Button */}
+              <button
+                onClick={handleLogout}
+                className="bg-yellow-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+              >
+                Logout
+              </button>
+                </div>
 
         {/* Cart Icon */}
         <Link to="/cart" className="relative hidden md:block">
@@ -46,12 +64,10 @@ const Header1 = () => {
           <nav className="flex flex-col gap-4 text-lg font-bold font-poppins text-black">
             <NavLink to="/home" onClick={closeMenu} className="hover:text-white">Home</NavLink>
             <NavLink to="/home/about" onClick={closeMenu} className="hover:text-white">About</NavLink>
-            <NavLink to="/home/products" onClick={closeMenu} className="hover:text-white">Products</NavLink>
+            <NavLink to="/buyerpage" onClick={closeMenu} className="hover:text-white">Buy</NavLink>
             <NavLink to="/home/trade" onClick={closeMenu} className="hover:text-white">Trade</NavLink>
             <NavLink to="/home/donate" onClick={closeMenu} className="hover:text-white">Donate</NavLink>
-
-
-           
+            
             <Link to="/cart" onClick={closeMenu} className="flex items-center gap-2 text-white">
               <ShoppingCart className="w-5 h-5" />
               <span>Cart</span>

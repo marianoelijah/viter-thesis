@@ -17,7 +17,7 @@ const Welcome = () => {
         <Link to="/register" className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-yellow-500">
           Get Started
         </Link>
-        <Link to="/register" className="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-500">
+        <Link to="/login" className="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-500">
           Login
         </Link>
       </div>

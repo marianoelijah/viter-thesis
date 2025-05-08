@@ -1,29 +1,61 @@
-// tradeRoutes.js
 import express from 'express';
-import db from '../db.js';
+import db from '../config/db.js'; // Adjust path as necessary
 
 const router = express.Router();
 
-// GET /api/trades/matches - find matching trades
-router.get('/matches', async (req, res) => {
-  try {
-    const [rows] = await db.execute(`
-      SELECT t1.id AS user1_trade_id, t2.id AS user2_trade_id,
-             t1.username AS user1, t2.username AS user2,
-             t1.offered_item AS user1_offers, t1.requested_item AS user1_wants,
-             t2.offered_item AS user2_offers, t2.requested_item AS user2_wants
-      FROM trades t1
-      JOIN trades t2
-        ON t1.offered_item = t2.requested_item
-        AND t1.requested_item = t2.offered_item
-        AND t1.username != t2.username
-    `);
+// POST route for /api/trade
+router.post('/', (req, res) => {
+  console.log('Trade POST request received');
+  const { buyerId, items, totalAmount } = req.body;
 
-    res.json(rows);
-  } catch (error) {
-    console.error('Error fetching trade matches:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+  // Start a transaction to insert the trade and its items
+  db.beginTransaction((err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Transaction start failed' });
+    }
+
+    const sqlTrade = `
+      INSERT INTO trades (buyer_id, total_amount, status)
+      VALUES (?, ?, ?)
+    `;
+    db.query(sqlTrade, [buyerId, totalAmount, 'pending'], (err, result) => {
+      if (err) {
+        return db.rollback(() => {
+          res.status(500).json({ error: 'Failed to create trade' });
+        });
+      }
+
+      const tradeId = result.insertId;
+      const sqlItems = `
+        INSERT INTO trade_items (trade_id, product_id, quantity, total_price)
+        VALUES (?, ?, ?, ?)
+      `;
+
+      // Insert each cart item as a trade item
+      items.forEach((item, index) => {
+        db.query(sqlItems, [tradeId, item.productId, item.quantity, item.totalPrice], (err) => {
+          if (err) {
+            return db.rollback(() => {
+              res.status(500).json({ error: 'Failed to save trade items' });
+            });
+          }
+
+          // After inserting all items, commit the transaction
+          if (index === items.length - 1) {
+            db.commit((err) => {
+              if (err) {
+                return db.rollback(() => {
+                  res.status(500).json({ error: 'Transaction commit failed' });
+                });
+              }
+
+              res.json({ message: 'Trade saved successfully' });
+            });
+          }
+        });
+      });
+    });
+  });
 });
 
 export default router;

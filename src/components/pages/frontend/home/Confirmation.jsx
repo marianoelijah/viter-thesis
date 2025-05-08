@@ -1,29 +1,46 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { CheckCircle } from "lucide-react";
+import { useLocation, Link } from "react-router-dom";
 
 const Confirmation = () => {
-  return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
-      <CheckCircle className="text-green-500 w-16 h-16 mb-4" />
-      <h2 className="text-2xl font-bold mb-2">Thank you for your order!</h2>
-      <p className="text-gray-600 mb-6">
-        Your order has been placed successfully. You will receive a confirmation email or SMS shortly.
-      </p>
-      <div className="space-x-4">
-        <Link
-          to="/home"
-          className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
-        >
-          Back to Home
-        </Link>
-        <Link
-          to="/orders"
-          className="border border-green-600 text-green-600 px-6 py-2 rounded hover:bg-green-100 transition"
-        >
-          View My Orders
-        </Link>
+  const location = useLocation();
+  const orderData = location.state?.orderData;
+
+  if (!orderData) {
+    return (
+      <div className="p-4">
+        <p className="text-red-600">No order found.</p>
+        <Link to="/userinterface" className="text-blue-600 underline">Back to Home</Link>
       </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-2xl font-bold text-green-700 mb-4">🎉 Order Confirmed!</h1>
+      <p className="mb-4">Order ID: <strong>{orderData.id}</strong></p>
+
+      <h2 className="text-lg font-semibold mt-6 mb-2">Delivery Details</h2>
+      <ul className="mb-4">
+        <li><strong>Name:</strong> {orderData.userDetails.fullName}</li>
+        <li><strong>Email:</strong> {orderData.userDetails.email}</li>
+        <li><strong>Phone:</strong> {orderData.userDetails.phone}</li>
+        <li><strong>Address:</strong> {orderData.userDetails.address}, {orderData.userDetails.city}, {orderData.userDetails.postalCode}</li>
+      </ul>
+
+      <h2 className="text-lg font-semibold mb-2">Order Summary</h2>
+      <ul className="mb-4 space-y-1">
+        {orderData.items.map((item, idx) => (
+          <li key={idx}>
+            {item.name} x{item.quantity} = ₱{(item.price * item.quantity).toFixed(2)}
+          </li>
+        ))}
+      </ul>
+
+      <p><strong>Total:</strong> ₱{orderData.total.toFixed(2)}</p>
+
+      <Link to="/userinterface" className="inline-block mt-6 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded">
+        Return to Home
+      </Link>
     </div>
   );
 };
