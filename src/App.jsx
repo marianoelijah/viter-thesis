@@ -33,7 +33,8 @@ import TradeCart from "./components/pages/frontend/Trades/TradeCart";
 import UploadDonationForm from "./components/pages/frontend/Trades/UploadDonationForm";
 import { Toaster } from 'react-hot-toast';
 import CashoutTrade from "./components/pages/frontend/Trades/CashoutTrade";
-
+import OrderDetails from "./components/pages/frontend/buyerInterface/OrderDetails.jsx";
+import { CartProvider } from "./components/context/CartContext";
 
 
 const App = () => {
@@ -44,52 +45,51 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <StoreProvider>
-        
-        <Toaster position="top-right" />
-          <Routes>
-            <Route index element={<Welcome />} />
-            <Route path="/home" element={<Homepage />} />
-            <Route path="/home/about" element={<About />} />
-            <Route path="/home/products" element={<Productss />} />
-            <Route path="/home/trade" element={<Trade />} />
-            <Route path="/home/donate" element={<Donate />} />
-            <Route path="/inventory" element={<Inventory cart={cart} setCart={setCart} />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/cashout" element={<Cashout />} />
-            <Route path="/confirmation" element={<Confirmation />} />
+          {/* Move CartProvider here to wrap all routes */}
+          <CartProvider>
+            <Toaster position="top-right" />
+            <Routes>
+              <Route index element={<Welcome />} />
+              <Route path="/home" element={<Homepage />} />
+              <Route path="/home/about" element={<About />} />
+              <Route path="/home/products" element={<Productss />} />
+              <Route path="/home/trade" element={<Trade />} />
+              <Route path="/home/donate" element={<Donate />} />
+              <Route path="/inventory" element={<Inventory cart={cart} setCart={setCart} />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/cashout" element={<Cashout />} />
+              <Route path="/confirmation" element={<Confirmation />} />
 
-            {/* authentication */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            
-            {/* buyer-interface */}
-            <Route path="/buyerpage" element={<BuyerPage />} />
-            <Route path="/userinterface" element={<UserInterface />} />
-            <Route path="/cashout2" element={<Cashout2 />} />
-            <Route path="/tradecart" element={<TradeCart />} />
-            <Route path="/donationform" element={<UploadDonationForm />} />
-            <Route path="/cashout-trade" element={<CashoutTrade />} />
+              {/* authentication */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              
+              {/* buyer-interface */}
+              <Route path="/buyerpage" element={<BuyerPage />} />
+              <Route path="/userinterface" element={<UserInterface />} />
+              <Route path="/cashout2" element={<Cashout2 />} />
+              <Route path="/tradecart" element={<TradeCart />} />
+              <Route path="/donationform" element={<UploadDonationForm />} />
+              <Route path="/cashout-trade" element={<CashoutTrade />} />
 
+              <Route path="/order/:id" element={<OrderDetails />} />
 
-            {/* seler-interface */}
-            <Route path="/sellerpage" element={<SellerPage />} />
-            <Route path="/admininterface" element={<AdminInterface />} />
-            <Route path="/sellerlayout" element={<SellerLayout />} />
+              {/* seller-interface */}
+              <Route path="/sellerpage" element={<SellerPage />} />
+              <Route path="/admininterface" element={<AdminInterface />} />
+              <Route path="/sellerlayout" element={<SellerLayout />} />
 
-
-             {/* Seller Side Routes */}
-            <Route path="/seller/add-product" element={<AddProduct />} />
-            <Route path="/seller/edit-product/:id" element={<EditProduct />} />
-            <Route path="/seller/my-products" element={<MyProducts />} />
-            <Route path="/seller/manage-orders" element={<ManageOrders />} />
-            <Route path="/seller/donations" element={<DonationsManagement />} />
-            <Route path="/seller/profile" element={<SellerProfile />} />
-            <Route path="/product-dashboard" element={<ProductDashboard />} />
-            <Route path="/trade-product" element={<TradeOffers />} />
-
-           
-            
-          </Routes>
+              {/* Seller Side Routes */}
+              <Route path="/seller/add-product" element={<AddProduct />} />
+              <Route path="/seller/edit-product/:id" element={<EditProduct />} />
+              <Route path="/seller/my-products" element={<MyProducts />} />
+              <Route path="/seller/manage-orders" element={<ManageOrders />} />
+              <Route path="/seller/donations" element={<DonationsManagement />} />
+              <Route path="/seller/profile" element={<SellerProfile />} />
+              <Route path="/product-dashboard" element={<ProductDashboard />} />
+              <Route path="/trade-product" element={<TradeOffers />} />
+            </Routes>
+          </CartProvider>
         </StoreProvider>
       </AuthProvider>
     </QueryClientProvider>
@@ -97,3 +97,4 @@ const App = () => {
 };
 
 export default App;
+

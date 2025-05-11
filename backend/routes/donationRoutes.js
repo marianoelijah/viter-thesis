@@ -1,41 +1,30 @@
 import express from 'express';
-import multer from 'multer';
-import path from 'path';
 import db from '../config/db.js';
 
 const router = express.Router();
 
-// Storage config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Ensure this folder exists
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueName);
-  }
-});
-
-const upload = multer({ storage });
-
-// POST donated product
-router.post('/upload-donation', upload.single('image'), (req, res) => {
-  const { name, category, quantity, date, donorName, notes } = req.body;
-  const image = req.file ? req.file.filename : null;
-
-  const sql = `
-    INSERT INTO donated_products 
-    (name, category, quantity, image, date, donorName, notes)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  db.query(sql, [name, category, quantity, image, date, donorName, notes], (err, result) => {
-    if (err) {
-      console.error('Error uploading donation:', err);
-      return res.status(500).json({ message: 'Error uploading donation' });
+// POST route to handle donation request
+router.post('/api/donation-request', async (req, res) => {
+  try {
+    const { productName, donor, dateRequested, userId } = req.body;
+    
+    // Validate input data (optional but recommended)
+    if (!productName || !donor || !dateRequested || !userId) {
+      return res.status(400).json({ message: "Missing required fields" });
     }
-    res.status(200).json({ message: 'Donation uploaded successfully' });
-  });
+
+    // Save donation request to the database
+    const result = await db.query(
+      'INSERT INTO donation_requests (product_name, donor, date_requested, user_id) VALUES (?, ?, ?, ?)',
+      [productName, donor, dateRequested, userId]
+    );
+
+    // Send response if successful
+    res.status(200).json({ message: 'Donation request submitted successfully!', donationId: result.insertId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 export default router;

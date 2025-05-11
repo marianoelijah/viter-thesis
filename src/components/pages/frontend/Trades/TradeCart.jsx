@@ -1,24 +1,13 @@
 import { AuthContext } from '@/context/AuthContext';
 import React, { useEffect, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from "lucide-react";
 
 
 const TradeCart = () => {
   const { user } = useContext(AuthContext); // get logged-in user
   const [cartItems, setCartItems] = useState([]);
-
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        const res = await fetch(`http://localhost:3000/api/tradecart/${user.id}`);
-        const data = await res.json();
-        setCartItems(data);
-      } catch (err) {
-        console.error('Failed to fetch trade cart:', err);
-      }
-    };
-
-    if (user?.id) fetchCart();
-  }, [user]);
+  const navigate = useNavigate();
 
   const confirmTrade = async () => {
     try {
@@ -37,6 +26,9 @@ const TradeCart = () => {
 
   return (
     <div className="p-6">
+       <button onClick={() => navigate(-1)} className="flex items-center text-gray-700 hover:text-green-600">
+          <ArrowLeft className="mr-2" /> Back
+        </button>
       <h2 className="text-xl font-bold mb-4">Trade Cart</h2>
       {cartItems.length === 0 ? (
         <p>Your trade cart is empty.</p>

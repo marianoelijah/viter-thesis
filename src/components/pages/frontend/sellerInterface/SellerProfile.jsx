@@ -1,65 +1,78 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const SellerProfile = () => {
+  const [storeName, setStoreName] = useState("");
+  const [email, setEmail] = useState("");
+  const [sellerId, setSellerId] = useState(null);
   const navigate = useNavigate();
-  const [storeName, setStoreName] = useState("Seedling Farm");
-  const [email, setEmail] = useState("seller@example.com");
 
-  const handleUpdateProfile = () => {
-    // Placeholder function to handle profile update
-    alert("Profile updated successfully!");
+  // ✅ Load seller ID and profile on mount
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser && storedUser.id) {
+      setSellerId(storedUser.id);
+      fetchSellerProfile(storedUser.id);
+    } else {
+      console.error("No user ID found in localStorage");
+      navigate("/login");
+    }
+  }, []);
+
+  // ✅ Fetch seller profile data
+  const fetchSellerProfile = async (id) => {
+    try {
+      const response = await axios.get(`/api/seller-profile/${id}`);
+      setStoreName(response.data.store_name || "");
+      setEmail(response.data.email || "");
+    } catch (error) {
+      console.error("Failed to fetch seller profile:", error);
+    }
+  };
+
+  // ✅ Update profile
+  const handleUpdateProfile = async () => {
+    if (!sellerId) {
+      alert("Seller ID is missing. Please log in again.");
+      return;
+    }
+
+    try {
+      await axios.put(`/api/seller-profile/${sellerId}`, {
+        storeName,
+        email,
+      });
+      alert("Profile updated successfully!");
+    } catch (error) {
+      alert("Error updating profile");
+      console.error("Error updating profile", error);
+    }
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-semibold text-center mb-8">Fampco Profile</h1>
-      
-      <div className="bg-green-200 p-6 rounded-lg shadow-lg">
-        <div className="space-y-6">
-          {/* Back Button */}
-          <button
-            onClick={() => navigate(-1)} // This will navigate the user back to the previous page
-            className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-all focus:outline-none focus:ring-2 focus:ring-gray-500"
-          >
-            Back
-          </button>
-
-          {/* Store Name Field */}
-          <div>
-            <label className="block font-semibold text-gray-700 mb-2">Store Name</label>
-            <input
-              type="text"
-              value={storeName}
-              onChange={(e) => setStoreName(e.target.value)}
-              placeholder="Enter your store name"
-              className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
-            />
-          </div>
-
-          {/* Email Field */}
-          <div>
-            <label className="block font-semibold text-gray-700 mb-2">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
-            />
-          </div>
-
-          {/* Update Button */}
-          <div className="mt-6 flex justify-center">
-            <button
-              onClick={handleUpdateProfile}
-              className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Update Profile
-            </button>
-          </div>
-        </div>
-      </div>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Seller Profile</h2>
+      <input
+        type="text"
+        placeholder="Store Name"
+        value={storeName}
+        onChange={(e) => setStoreName(e.target.value)}
+        className="border p-2 mb-2 w-full"
+      />
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="border p-2 mb-2 w-full"
+      />
+      <button
+        onClick={handleUpdateProfile}
+        className="bg-green-600 text-white px-4 py-2 rounded"
+      >
+        Update Profile
+      </button>
     </div>
   );
 };

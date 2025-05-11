@@ -1,8 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { CartContext } from "@/components/context/CartContext";
+
 import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
+import { CartContext } from "@/components/context/CartContext";
 
 const products = [
   { id: 1, name: "Papaya", price: 75, image: "/img/papaya.jpg", description: "Ripe and juicy papayas, rich in vitamins and antioxidants.", category: "Fruit" },

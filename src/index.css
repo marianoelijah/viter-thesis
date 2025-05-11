@@ -128,6 +128,9 @@
   .container {
     @apply max-w-[1800px] mx-auto px-4;
   }
+  .input {
+    @apply p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400;
+  }
   .btn {
     @apply p-1.5 py-2 border border-transparent flex gap-2 rounded-md transition-all items-center bg-primary text-sm;
   }

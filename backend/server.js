@@ -8,11 +8,13 @@ import mysql from 'mysql2/promise';
 // Route imports
 import productsRoutes from './routes/products.js';
 import authRoutes from './routes/authRoutes.js';
-import tradeCartRoutes from './routes/tradeCart.js';
-import tradeRoutes from './routes/tradeRoutes.js';
 import donationRoutes from './routes/donationRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
+import tradeRouter from './routes/tradeRoutes.js';
+import sellerProfileRoutes from './routes/sellerProfileRoutes.js';
+import tradeCartRoutes from './routes/tradeCart.js';
+
 
 // Mysql Database
 // config/db.js
@@ -29,7 +31,6 @@ const db = mysql.createPool({
 
 // Recommendation API from python
 import axios from 'axios'; // Correct for ES Modules
-
 async function getRecommendations(userEncoded) {
     try {
         const response = await axios.post('http://192.168.114.67:5000/recommend', {
@@ -50,7 +51,6 @@ getRecommendations(10);
 
 // Initialize express app
 const app = express();
-
 const PORT = process.env.PORT || 3000;
 
 // __dirname fix for ES modules
@@ -69,12 +69,13 @@ app.get('/', (req, res) => res.send('CORS is enabled!'));
 // Mount routers
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
-app.use('/api/tradecart', tradeCartRoutes);
-app.use('/api/trade', tradeRoutes);
-app.use('/api', tradeRoutes); // ✅ Mounts it correctly
+app.use('/api/trade', tradeRouter);
 app.use('/api/donation', donationRoutes);
 app.use('/api/orders2', orderRoutes);  // For checkout/order handling
 app.use(productRoutes); // For product handling
+app.use(donationRoutes);
+app.use(sellerProfileRoutes);
+app.use('/api/tradecart', tradeCartRoutes);
 
 app.use((req, res) => {
   res.status(404).send(`❌ Route not found: ${req.originalUrl}`);
@@ -84,3 +85,4 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
+

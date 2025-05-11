@@ -1,18 +1,32 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
+
 const DonationsManagement = () => {
+  const [donationRequests, setDonationRequests] = useState([]);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [donations, setDonations] = useState([
-    { id: 1, item: 'Excess Lettuce', quantity: 10, donatedTo: 'Local Shelter' },
-    { id: 2, item: 'Tomato Surplus', quantity: 15, donatedTo: 'Food Bank' },
-    { id: 3, item: 'Cabbage', quantity: 8, donatedTo: 'Community Kitchen' },
-  ]);
-
+  
   const filteredDonations = donations.filter((donation) =>
     donation.item.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/donation-requests");
+        const data = await res.json();
+        setDonationRequests(data); // Assume this returns the list of requests
+      } catch (err) {
+        console.error("Failed to fetch donation requests:", err);
+      }
+    };
+  
+    fetchRequests();
+  }, []);
+
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-green-50 via-blue-50 to-green-100 py-10 px-4">

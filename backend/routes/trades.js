@@ -75,6 +75,73 @@ router.post('/add', (req, res) => {
       res.status(200).json({ message: 'Added to trade cart successfully' });
     });
   });
+
+// POST /api/trade handler Stock Update 
+router.post('/api/trade', async (req, res) => {
+  const { trades } = req.body;
+
+  try {
+    for (const trade of trades) {
+      const [product] = await db.query('SELECT stock FROM products WHERE id = ?', [trade.product_id]);
+
+      if (product[0].stock < trade.quantity) {
+        return res.status(400).json({ error: 'Insufficient stock' });
+      }
+
+      // Insert trade transaction
+      await db.query(
+        'INSERT INTO trades (buyer_id, product_id, quantity, price, total_price) VALUES (?, ?, ?, ?, ?)',
+        [trade.buyer_id, trade.product_id, trade.quantity, trade.price, trade.total_price]
+      );
+
+      // Update product stock
+      await db.query(
+        'UPDATE products SET stock = stock - ? WHERE id = ?',
+        [trade.quantity, trade.product_id]
+      );
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+router.post('/api/trade', async (req, res) => {
+  const { trades } = req.body;
+
+  try {
+    for (const trade of trades) {
+      // Get current stock
+      const [productRows] = await db.execute('SELECT stock FROM products WHERE id = ?', [trade.product_id]);
+      const currentStock = productRows[0]?.stock || 0;
+
+      // Check for sufficient stock
+      if (currentStock < trade.quantity) {
+        return res.status(400).json({ error: `Insufficient stock for product ID ${trade.product_id}` });
+      }
+
+      // Insert trade transaction
+      await db.execute(
+        'INSERT INTO trades (buyer_id, product_id, quantity, price, total_price) VALUES (?, ?, ?, ?, ?)',
+        [trade.buyer_id, trade.product_id, trade.quantity, trade.price, trade.total_price]
+      );
+
+      // Update product stock
+      await db.execute(
+        'UPDATE products SET stock = stock - ? WHERE id = ?',
+        [trade.quantity, trade.product_id]
+      );
+    }
+
+    res.status(200).json({ message: 'Trade completed successfully.' });
+  } catch (err) {
+    console.error('Trade error:', err);
+    res.status(500).json({ error: 'Internal server error during trade.' });
+  }
+});
+
   
 
 export default router;

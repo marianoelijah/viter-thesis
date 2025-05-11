@@ -1,202 +1,162 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from 'react'; // ✅ include useEffect
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { useCart } from "@/components/context/CartContext";
+import { useCart } from '@/components/context/CartContext';
+
 
 const Cashout = () => {
-  const [formData, setFormData] = useState({
-    full_name: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    postal_code: "",
-    notes: "",
-    payment_method: "Cash on Delivery",
+  const { cartItems, getTotalPrice, clearCart } = useCart();
+  const [orderData, setOrderData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    postalCode: '',
+    notes: '',
+    paymentMethod: '',
+    subtotal: 0,
+    tax: 0,
+    total: 0,
+    items: [],
+    userId: 1
   });
 
-  const [subtotal, setSubtotal] = useState(0);
-  const tax = 0;
-  const { cart, clearCart } = useCart();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
-  // Calculate subtotal whenever cart changes
-  // useEffect(() => {
-  //   if (Array.isArray(cart)) {
-  //     const calculatedSubtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  //     setSubtotal(calculatedSubtotal);
-  //   }
-  // }, [cart]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleInputChange = (e) => {
+    setOrderData({
+      ...orderData,
+      [e.target.name]: e.target.value,
+    });
   };
+
+  useEffect(() => {
+  const subtotal = getTotalPrice();
+  const tax = subtotal * 0.12;
+  const total = subtotal + tax;
+
+  const items = cartItems.map(item => ({
+  id: item.id,  // this must match product_id in DB
+  price: item.price,
+  quantity: item.quantity,
+}));
+
+
+
+  setOrderData(prev => ({
+    ...prev,
+    subtotal,
+    tax,
+    total,
+    items
+  }));
+}, [cartItems]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Destructure formData
-    const {
-      full_name,
-      email,
-      phone,
-      address,
-      city,
-      postal_code,
-      notes,
-      payment_method
-    } = formData;
-
-    // Construct order payload
-    const orderPayload = {
-      userDetails: {
-        fullName: full_name,
-        email,
-        phone,
-        address,
-        city,
-        postalCode: postal_code,
-        notes,
-        paymentMethod: payment_method,
-      },
-      items: cart.map((item) => ({
-        id: item.id,
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-      })),
-      subtotal,
-      tax,
-      total: subtotal + tax,
-    };
-
     try {
-      // Send order data to the backend
-      const response = await axios.post("http://localhost:3000/api/orders2", orderPayload);
-      toast.success("Order placed successfully!");
-
-      // Update stock for each cart item
-      for (const item of cart) {
-        await axios.put(`http://localhost:3000/api/products/${item.id}/decrease-stock`, {
-          quantity: item.quantity,
-        });
-      }
-
-      // Clear the cart and navigate to confirmation
-      clearCart();
-      navigate("/confirmation");
-    } catch (error) {
-      console.error("Checkout error:", error.response?.data || error.message);
-      toast.error("Checkout failed.");
+      const response = await axios.post('http://localhost:3000/api/orders2', orderData); // Make sure this URL matches your backend
+      alert('Order placed successfully!');
+      console.log(orderData); // Replace with your actual variable
+      navigate(`/order/${response.data.orderId}`); // Correct navigation method
+    } catch (err) {
+      console.error('Error placing order:', err);
+      alert('Failed to place order. Please try again.');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-2xl bg-white shadow-xl rounded-2xl p-8">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Checkout</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Inputs Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              name="full_name"
-              value={formData.full_name}
-              onChange={handleChange}
-              placeholder="Full Name"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            />
-            <input
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Email"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            />
-            <input
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="Phone"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            />
-            <input
-              name="postal_code"
-              value={formData.postal_code}
-              onChange={handleChange}
-              placeholder="Postal Code"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            />
-            <input
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              placeholder="City"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            />
-            <input
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              placeholder="Address"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            />
-          </div>
+    <div className="min-h-screen bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 flex justify-center items-center py-12">
+      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg">
+      <button
+          onClick={() => navigate(-1)} // Navigate back
+          className="bg-gray-600 text-white px-4 py-2 rounded mb-6 hover:bg-gray-700 focus:outline-none"
+        >
+          Back to Orders
+        </button>
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Checkout</h1>
 
-          {/* Notes Field */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Form fields for order details */}
+          <input
+            type="text"
+            name="fullName"
+            placeholder="Full Name"
+            value={orderData.fullName}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={orderData.email}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="text"
+            name="phone"
+            placeholder="Phone"
+            value={orderData.phone}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="text"
+            name="address"
+            placeholder="Address"
+            value={orderData.address}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="text"
+            name="city"
+            placeholder="City"
+            value={orderData.city}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="text"
+            name="postalCode"
+            placeholder="Postal Code"
+            value={orderData.postalCode}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
           <textarea
             name="notes"
-            value={formData.notes}
-            onChange={handleChange}
-            placeholder="Additional Notes"
-            rows={3}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Notes"
+            value={orderData.notes}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-
-          {/* Payment Method */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
-            <select
-              name="payment_method"
-              value={formData.payment_method}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            >
-              <option value="Cash on Delivery">Cash on Delivery</option>
-              {/* More payment options can be added here */}
-            </select>
-          </div>
-
-          {/* Order Summary */}
-          <div className="border-t pt-4 text-gray-700">
-            <div className="flex justify-between text-sm">
-              <span>Subtotal:</span>
-              <span>₱{subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span>Tax:</span>
-              <span>₱{tax.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-lg font-semibold text-gray-900 mt-2">
-              <span>Total:</span>
-              <span>₱{(subtotal + tax).toFixed(2)}</span>
-            </div>
-          </div>
-
-          {/* Submit Button */}
+          <input
+            type="text"
+            name="paymentMethod"
+            placeholder="Payment Method"
+            value={orderData.paymentMethod}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          
           <button
             type="submit"
-            className="bg-green-500 text-white px-4 py-2 rounded"
+            className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Confirm & Pay
+            Place Order
           </button>
+          <div className="border-t pt-4 mt-4">
+  <p><strong>Subtotal:</strong> ₱{orderData.subtotal.toFixed(2)}</p>
+  <p><strong>Tax:</strong> ₱{orderData.tax.toFixed(2)}</p>
+  <p><strong>Total:</strong> ₱{orderData.total.toFixed(2)}</p>
+</div>
+
         </form>
       </div>
     </div>

@@ -1,63 +1,81 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    const storedCart = localStorage.getItem('cartItems');
+    return storedCart ? JSON.parse(storedCart) : [];
+  });
 
+  // Sync cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product) => {
-    const existingItem = cartItems.find(item => item.id === product.id);
-    if (existingItem) {
-      setCartItems(prevItems =>
-        prevItems.map(item =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
-      );
-    } else {
-      setCartItems(prevItems => [...prevItems, { ...product, quantity: 1 }]);
-    }
+  // In CartContext.js
+const refreshCart = async (userId) => {
+  const res = await axios.get(`http://localhost:3000/api/tradecart/${userId}`);
+  setCartItems(res.data); // if you're storing cart items
+};
+
+
+  const addToCart = (item) => {
+    setCartItems(prevCartItems => {
+      const existing = prevCartItems.find(i => i.id === item.id);
+      if (existing) {
+        return prevCartItems.map(i =>
+          i.id === item.id
+            ? { ...i, quantity: i.quantity + item.quantity }
+            : i
+        );
+      } else {
+        return [...prevCartItems, item];
+      }
+    });
   };
 
-  const updateQuantity = (id, amount) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? { ...item, quantity: amount } : item
+  const updateQuantity = (productId, quantity) => {
+    setCartItems(prevCartItems =>
+      prevCartItems.map(item =>
+        item.id === productId ? { ...item, quantity } : item
       )
     );
   };
 
-  const incrementQuantity = (id) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+  const incrementQuantity = (productId) => {
+    setCartItems(prevCartItems =>
+      prevCartItems.map(item =>
+        item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
       )
     );
   };
 
-  const decrementQuantity = (id) => {
-    setCartItems(prevItems =>
-      prevItems
-        .map(item =>
-          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-        )
-        .filter(item => item.quantity > 0)
+  const decrementQuantity = (productId) => {
+    setCartItems(prevCartItems =>
+      prevCartItems.map(item =>
+        item.id === productId ? { ...item, quantity: item.quantity - 1 } : item
+      )
     );
   };
 
-  const removeFromCart = (id) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== id));
+  const removeFromCart = (productId) => {
+    setCartItems(prevCartItems =>
+      prevCartItems.filter(item => item.id !== productId)
+    );
   };
 
-  const clearCart = () => setCartItems([]);
+  const clearCart = () => {
+    setCartItems([]);
+  };
 
-  const getTotal = () =>
-    cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const getTotalPrice = () => {
+    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  };
+
+  const getTotal = () => {
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  };
 
   return (
     <CartContext.Provider
@@ -69,6 +87,7 @@ export const CartProvider = ({ children }) => {
         decrementQuantity,
         removeFromCart,
         clearCart,
+        getTotalPrice,
         getTotal
       }}
     >
@@ -77,5 +96,4 @@ export const CartProvider = ({ children }) => {
   );
 };
 
-// 👇 Add this at the end
 export const useCart = () => useContext(CartContext);

@@ -1,103 +1,86 @@
 import express from 'express';
-import db from '../config/db.js';
-
+import db from '../config/db.js'; // adjust path if needed
 
 const router = express.Router();
 
+/**
+ * Add item to trade cart (or update quantity if it already exists)
+ * POST /api/tradecart/add
+ */
+router.post('/add', async (req, res) => {
+  const { userId, productId, quantity } = req.body;
+  console.log("Request Body:", req.body); // Debug log
 
-
-// routes/tradeCart.js (append this)
-router.get('/:buyer_id', (req, res) => {
-    const buyerId = req.params.buyer_id;
-  
-    const query = `
-      SELECT tc.id AS cart_id, tc.quantity, tc.added_at,
-             p.id AS product_id, p.name, p.description, p.image, p.price
-      FROM trade_cart tc
-      JOIN products p ON tc.product_id = p.id
-      WHERE tc.buyer_id = ?
-    `;
-  
-    db.query(query, [buyerId], (err, results) => {
-      if (err) {
-        console.error('Error fetching trade cart:', err);
-        return res.status(500).json({ message: 'Database error' });
-      }
-  
-      res.status(200).json(results);
-    });
-  });
-
-// server.js or routes/trade.js
-router.post('/api/tradecart/checkout', (req, res) => {
-  const { buyerId, cartItems } = req.body;
-
-  if (!buyerId || !Array.isArray(cartItems)) {
-    return res.status(400).json({ error: 'Missing required data' });
+  if (!userId || !productId || !quantity) {
+    return res.status(400).json({ message: "Missing required fields" });
   }
 
-  const sql = `
-    INSERT INTO trade_orders (buyer_id, product_id, quantity)
-    VALUES ?
-  `;
+  try {
+    // Check if item already in trade cart
+    const [existing] = await db.query(
+      'SELECT * FROM trade_cart WHERE user_id = ? AND product_id = ?',
+      [userId, productId]
+    );
 
-  const values = cartItems.map(item => [
-    buyerId,
-    item.id,       // assuming item.id is product_id
-    item.quantity
-  ]);
-
-  db.query(sql, [values], (err, result) => {
-    if (err) {
-      console.error('Error inserting trade orders:', err);
-      return res.status(500).json({ error: 'Database error' });
+    if (existing.length > 0) {
+      // Update quantity
+      await db.query(
+        'UPDATE trade_cart SET quantity = quantity + ? WHERE user_id = ? AND product_id = ?',
+        [quantity, userId, productId]
+      );
+    } else {
+      // Insert new item
+      await db.query(
+        'INSERT INTO trade_cart (user_id, product_id, quantity) VALUES (?, ?, ?)',
+        [userId, productId, quantity]
+      );
     }
-    res.json({ success: true, insertedRows: result.affectedRows });
-  });
+
+    res.json({ message: 'Item added to trade cart' });
+  } catch (err) {
+    console.error("Error adding to trade cart:", err); // Detailed logging
+    res.status(500).json({ message: 'Server error adding to trade cart', error: err.message });
+  }
 });
 
-  // routes/tradeCart.js ///api/tradecart/checkout/:buyer_id
-router.post('/checkout/:buyer_id', (req, res) => {
-    const buyerId = req.params.buyer_id;
-  
-    const getCartItems = `
-      SELECT product_id, quantity FROM trade_cart WHERE buyer_id = ?
-    `;
-  
-    const insertOrder = `
-      INSERT INTO trade_orders (buyer_id, product_id, quantity, ordered_at)
-      VALUES (?, ?, ?, NOW())
-    `;
-  
-    const clearCart = `
-      DELETE FROM trade_cart WHERE buyer_id = ?
-    `;
-  
-    db.query(getCartItems, [buyerId], (err, cartItems) => {
-      if (err) return res.status(500).json({ message: 'Error fetching cart items' });
-  
-      if (cartItems.length === 0) {
-        return res.status(400).json({ message: 'Cart is empty' });
-      }
-  
-      // Insert all items as trade orders
-      const values = cartItems.map(item => [buyerId, item.product_id, item.quantity]);
-  
-      db.query(insertOrder, [values], (err) => {
-        if (err) return res.status(500).json({ message: 'Error saving trade orders' });
-  
-        // Clear trade cart
-        db.query(clearCart, [buyerId], (err) => {
-          if (err) return res.status(500).json({ message: 'Error clearing cart' });
-  
-          res.status(200).json({ message: 'Trade confirmed successfully' });
-        });
-      });
-    });
-  });
 
- 
+/**
+ * Get all trade cart items for a specific user
+ * GET /api/tradecart/:userId
+ */
+router.get('/:userId', async (req, res) => {
+  const { userId } = req.params;
 
-  
+  try {
+    const [rows] = await db.query(
+      `SELECT tc.id, p.name, tc.quantity 
+       FROM trade_cart tc 
+       JOIN products p ON tc.product_id = p.id 
+       WHERE tc.user_id = ?`,
+      [userId]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database fetch error' });
+  }
+});
+
+/**
+ * Checkout (clear trade cart and process trade)
+ * POST /api/tradecart/checkout/:userId
+ */
+router.post('/checkout/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Here you would normally insert into a trades table, handle stock, etc.
+    await db.query('DELETE FROM trade_cart WHERE user_id = ?', [userId]);
+    res.json({ message: '✅ Trade confirmed and cart cleared' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '❌ Error confirming trade' });
+  }
+});
 
 export default router;
