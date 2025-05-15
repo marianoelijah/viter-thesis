@@ -254,9 +254,6 @@ const handleBuyNow = async (product) => {
               <h2 className="text-xl font-semibold">{product.name}</h2>
               <p className="text-gray-500">{product.category}</p>
               <span className="text-green-600">In stock: {product.availableStock}</span>
-              <p className="text-sm">
-                <span className="font-semibold">Expiry:</span> {new Date(product.expiryDate).toLocaleDateString()}
-              </p>
               <p>
                 <span className="font-semibold">Shop:</span> {product.shop}
               </p>

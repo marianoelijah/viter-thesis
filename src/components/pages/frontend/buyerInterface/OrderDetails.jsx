@@ -9,23 +9,21 @@ const OrderDetails = () => {
   const navigate = useNavigate(); // Hook to navigate back
 
   // Fetch order details using the order ID
- useEffect(() => {
-  const fetchOrderDetails = async () => {
-    try {
-      const response = await axios.get(`/api/orders2/${id}`);
-      console.log('Fetched Order:', response.data);
-      setOrder(response.data);
-    } catch (err) {
-      console.error('Failed to fetch order details:', err);
-    } finally {
-      setLoading(false); // ✅ this line is essential
-    }
-  };
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      try {
+        const response = await axios.get(`/api/orders2/${id}`);
+        console.log('Fetched Order:', response.data);
+        setOrder(response.data);
+      } catch (err) {
+        console.error('Failed to fetch order details:', err);
+      } finally {
+        setLoading(false); // ✅ this line is essential
+      }
+    };
 
-  fetchOrderDetails();
-}, [id]);
-
-  
+    fetchOrderDetails();
+  }, [id]);
 
   if (loading) {
     return <div className="text-center text-xl text-gray-600">Loading order details...</div>; // Show loading text while fetching
@@ -49,19 +47,19 @@ const OrderDetails = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
           <div>
-            <p><strong className="text-gray-700">Full Name:</strong> {order.full_name}</p>
+            <p><strong className="text-gray-700">Full Name:</strong> {order.fullName}</p>
             <p><strong className="text-gray-700">Email:</strong> {order.email}</p>
             <p><strong className="text-gray-700">Phone:</strong> {order.phone}</p>
           </div>
           <div>
             <p><strong className="text-gray-700">Address:</strong> {order.address}</p>
             <p><strong className="text-gray-700">City:</strong> {order.city}</p>
-            <p><strong className="text-gray-700">Postal Code:</strong> {order.postal_code}</p>
+            <p><strong className="text-gray-700">Postal Code:</strong> {order.postalCode}</p>
           </div>
         </div>
 
         <div className="bg-gray-200 p-4 rounded-lg mb-6">
-          <p><strong className="text-gray-700">Payment Method:</strong> {order.payment_method}</p>
+          <p><strong className="text-gray-700">Payment Method:</strong> {order.paymentMethod}</p>
           <p><strong className="text-gray-700">Subtotal:</strong> ${order.subtotal}</p>
           <p><strong className="text-gray-700">Tax:</strong> ${order.tax}</p>
           <p className="text-xl font-semibold"><strong>Total:</strong> ${order.total}</p>
@@ -72,7 +70,9 @@ const OrderDetails = () => {
           {Array.isArray(order.items) && order.items.length > 0 ? (
             order.items.map((item) => (
               <li key={item.id} className="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <p className="text-gray-800">{item.product_name} - {item.quantity} x ${item.price}</p>
+                <p className="text-gray-800">
+                  {item.productName} - {item.quantity} x ${item.price}
+                </p>
               </li>
             ))
           ) : (

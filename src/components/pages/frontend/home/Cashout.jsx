@@ -42,8 +42,6 @@ const Cashout = () => {
   quantity: item.quantity,
 }));
 
-
-
   setOrderData(prev => ({
     ...prev,
     subtotal,
@@ -136,14 +134,18 @@ const Cashout = () => {
             onChange={handleInputChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <input
-            type="text"
-            name="paymentMethod"
-            placeholder="Payment Method"
-            value={orderData.paymentMethod}
-            onChange={handleInputChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+         <select
+  name="paymentMethod"
+  value={orderData.paymentMethod}
+  onChange={handleInputChange}
+  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+>
+  <option value="">Select Payment Method</option>
+  <option value="cash">Cash on Delivery</option>
+  <option value="gcash">GCash</option>
+  <option value="bank">Bank Transfer</option>
+</select>
+
           
           <button
             type="submit"

@@ -266,7 +266,7 @@ const BuyerPage = () => {
                 <span className="font-semibold">Expiry:</span> {new Date(product.expiryDate).toLocaleDateString()}
               </p>
               <p>
-                <span className="font-semibold">Seller:</span> {product.seller}
+                <span className="font-semibold">Shop:</span> {product.shop}
               </p>
             </div>
           ))

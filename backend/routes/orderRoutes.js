@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
 
       if (availableStock === undefined || availableStock < item.quantity) {
         await conn.rollback();
-        return res.status(400).json({ message: `Not enough stock for ${item.name}` });
+       return res.status(400).json({ message: `Not enough stock for product ID ${item.id}` });
       }
 
       // Insert item
@@ -59,34 +59,61 @@ router.post('/', async (req, res) => {
 });
 
 // Get Order Details by ID
-router.get('/:id', async (req, res) => {
-  const orderId = req.params.id;
+// router.get('/:id', async (req, res) => {
+//   const orderId = req.params.id;
 
-  try {
-    const [orderResults] = await db.query('SELECT * FROM orders2 WHERE id = ?', [orderId]);
-    if (orderResults.length === 0) {
-      return res.status(404).json({ error: 'Order not found' });
-    }
+//   try {
+//     const [orderResults] = await db.query('SELECT * FROM orders2 WHERE id = ?', [orderId]);
+//     if (orderResults.length === 0) {
+//       return res.status(404).json({ error: 'Order not found' });
+//     }
 
-    const order = orderResults[0];
+//     const order = orderResults[0];
 
-    const [itemsResults] = await db.query(
-      `SELECT oi.*, p.name AS product_name, p.image AS product_image
-       FROM order_items oi
-       LEFT JOIN products p ON oi.product_id = p.id
-       WHERE oi.order_id = ?`,
-      [orderId]
-    );
+//     const [itemsResults] = await db.query(
+//       `SELECT oi.*, p.name AS product_name, p.image AS product_image
+//        FROM order_items oi
+//        LEFT JOIN products p ON oi.product_id = p.id
+//        WHERE oi.order_id = ?`,
+//       [orderId]
+//     );
 
-    res.json({ ...order, items: itemsResults });
-  } catch (err) {
-    console.error('❌ Failed to fetch order details:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+//     res.json({ ...order, items: itemsResults });
+//   } catch (err) {
+//     console.error('❌ Failed to fetch order details:', err);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
 
 // Get Order Details in Transactions
 // ✅ This is the one to keep and use in frontend
+// router.get('/:id', async (req, res) => {
+//   const orderId = req.params.id;
+
+//   try {
+//     const [orderResults] = await db.query('SELECT * FROM orders2 WHERE id = ?', [orderId]);
+//     if (orderResults.length === 0) {
+//       return res.status(404).json({ error: 'Order not found' });
+//     }
+
+//     const order = orderResults[0];
+
+//     const [itemsResults] = await db.query(
+//       `SELECT oi.*, p.name AS product_name, p.image AS product_image
+//        FROM order_items oi
+//        LEFT JOIN products p ON oi.product_id = p.id
+//        WHERE oi.order_id = ?`,
+//       [orderId]
+//     );
+
+//     res.json({ ...order, items: itemsResults });
+//   } catch (err) {
+//     console.error('❌ Failed to fetch order details:', err);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+// Get Order Details in Transactions (camelCase version for frontend)
 router.get('/:id', async (req, res) => {
   const orderId = req.params.id;
 
@@ -106,7 +133,30 @@ router.get('/:id', async (req, res) => {
       [orderId]
     );
 
-    res.json({ ...order, items: itemsResults });
+    res.json({
+      id: order.id,
+      userId: order.user_id,
+      fullName: order.full_name,
+      email: order.email,
+      phone: order.phone,
+      address: order.address,
+      city: order.city,
+      postalCode: order.postal_code,
+      notes: order.notes,
+      paymentMethod: order.payment_method,
+      subtotal: order.subtotal,
+      tax: order.tax,
+      total: order.total,
+      createdAt: order.created_at,
+      items: itemsResults.map(item => ({
+        id: item.id,
+        productId: item.product_id,
+        quantity: item.quantity,
+        price: item.price,
+        productName: item.product_name,
+        productImage: item.product_image
+      }))
+    });
   } catch (err) {
     console.error('❌ Failed to fetch order details:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -125,66 +175,5 @@ router.get('/products', async (req, res) => {
   }
 });
 
-// Route to handle order placement
-// router.post('/orders2', (req, res) => {
-//   const {
-//     fullName,
-//     email,
-//     phone,
-//     address,
-//     city,
-//     postalCode,
-//     notes,
-//     paymentMethod,
-//     subtotal,
-//     tax,
-//     total,
-//     items, // Array of items in the cart
-//   } = req.body;
-
-//   // Step 1: Insert the order details into the orders table
-//   const insertOrderQuery = `
-//     INSERT INTO orders (full_name, email, phone, address, city, postal_code, notes, payment_method, subtotal, tax, total)
-//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-//   `;
-
-//   const orderValues = [fullName, email, phone, address, city, postalCode, notes, paymentMethod, subtotal, tax, total];
-
-//   db.query(insertOrderQuery, orderValues, (err, result) => {
-//     if (err) {
-//       console.error('Error inserting order:', err);
-//       return res.status(500).json({ message: 'Error placing order' });
-//     }
-
-//     const orderId = result.insertId; // Get the inserted order's ID
-
-//     // Step 2: Insert the items into the order_items table
-//     const insertItemsQuery = `
-//       INSERT INTO order_items (order_id, product_id, name, price, quantity, total_price)
-//       VALUES ?
-//     `;
-
-//     const orderItems = items.map(item => [
-//       orderId,
-//       item.productId,
-//       item.name,
-//       item.price,
-//       item.quantity,
-//       item.price * item.quantity, // total_price for each item
-//     ]);
-
-//     db.query(insertItemsQuery, [orderItems], (err, result) => {
-//       if (err) {
-//         console.error('Error inserting order items:', err);
-//         return res.status(500).json({ message: 'Error placing order items' });
-//       }
-
-//       return res.status(201).json({
-//         message: 'Order placed successfully!',
-//         orderId, // Return the order ID for redirection
-//       });
-//     });
-//   });
-// });
 
 export default router;
