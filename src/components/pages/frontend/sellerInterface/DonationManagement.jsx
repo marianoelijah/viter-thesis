@@ -1,99 +1,86 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const DonationsManagement = () => {
-  const [donationRequests, setDonationRequests] = useState([]);
-  const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  const filteredDonations = donations.filter((donation) =>
-    donation.item.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+   const [requests, setRequests] = useState([]);
 
   useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const res = await fetch("http://localhost:3000/api/donation-requests");
-        const data = await res.json();
-        setDonationRequests(data); // Assume this returns the list of requests
-      } catch (err) {
-        console.error("Failed to fetch donation requests:", err);
-      }
-    };
-  
     fetchRequests();
   }, []);
 
+ const fetchRequests = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/donation-requests");
+      setRequests(res.data);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
+  };
+
+  const handleAction = async (requestId, action) => {
+    try {
+      await axios.put(`http://localhost:3000/api/donation-requests/${requestId}`, {
+        status: action,
+      });
+      toast.success(`Request ${action}`);
+      fetchRequests();
+    } catch (err) {
+      console.error("Update error:", err);
+      toast.error("Failed to update request.");
+    }
+  };
   
 
-  return (
-    <div className="min-h-screen bg-gradient-to-r from-green-50 via-blue-50 to-green-100 py-10 px-4">
-      <div className="max-w-5xl mx-auto bg-white p-8 rounded-2xl shadow-xl border border-green-200">
-
-        {/* Header and Back Button */}
-        <div className="flex justify-between items-center mb-6">
-          <button
-            onClick={() => navigate(-1)}
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-all"
-          >
-            ← Back
-          </button>
-          <h1 className="text-3xl font-bold text-green-700 text-center flex-grow">
-            Manage Donations
-          </h1>
-        </div>
-
-        {/* Search & Add Section */}
-        <div className="flex flex-col md:flex-row md:justify-between items-center gap-4 mb-8">
-          <input
-            type="text"
-            placeholder="Search by item..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-          <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-all">
-            + Add New Donation
-          </button>
-        </div>
-
-        {/* Donations Table */}
-        <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200">
-          <table className="min-w-full text-left">
-            <thead className="bg-green-600 text-white">
-              <tr>
-                <th className="p-4">Item</th>
-                <th className="p-4">Quantity</th>
-                <th className="p-4">Donated To</th>
+   return (
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-4">Donation Requests</h1>
+      {requests.length === 0 ? (
+        <p>No donation requests yet.</p>
+      ) : (
+        <table className="w-full border">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="p-2">Product</th>
+              <th>Buyer</th>
+              <th>Qty</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {requests.map((req) => (
+              <tr key={req.id}>
+                <td className="p-2">{req.product_name}</td>
+                <td>{req.buyer_name}</td>
+                <td>{req.quantity}</td>
+                <td>{req.status}</td>
+                <td>{new Date(req.request_date).toLocaleString()}</td>
+                <td>
+                  {req.status === "pending" && (
+                    <>
+                      <button
+                        onClick={() => handleAction(req.id, "approved")}
+                        className="bg-green-600 text-white px-3 py-1 rounded mr-2"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleAction(req.id, "rejected")}
+                        className="bg-red-500 text-white px-3 py-1 rounded"
+                      >
+                        Reject
+                      </button>
+                    </>
+                  )}
+                </td>
               </tr>
-            </thead>
-            <tbody className="bg-white">
-              {filteredDonations.length > 0 ? (
-                filteredDonations.map((donation) => (
-                  <tr
-                    key={donation.id}
-                    className="border-t hover:bg-green-50 transition-colors"
-                  >
-                    <td className="p-4">{donation.item}</td>
-                    <td className="p-4">{donation.quantity}</td>
-                    <td className="p-4">{donation.donatedTo}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3" className="p-6 text-center text-gray-500">
-                    No donations found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };
-
 export default DonationsManagement;

@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import axios from 'axios'; // ✅ make sure axios is imported
 
 export const CartContext = createContext();
 
@@ -13,12 +14,15 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // In CartContext.js
-const refreshCart = async (userId) => {
-  const res = await axios.get(`http://localhost:3000/api/tradecart/${userId}`);
-  setCartItems(res.data); // if you're storing cart items
-};
-
+  // ✅ Properly placed inside the component
+  const refreshCart = async (userId) => {
+    try {
+      const res = await axios.get(`http://localhost:3000/api/tradecart/${userId}`);
+      setCartItems(res.data); // assumes the backend returns cart items
+    } catch (err) {
+      console.error('Failed to refresh cart:', err);
+    }
+  };
 
   const addToCart = (item) => {
     setCartItems(prevCartItems => {
@@ -88,7 +92,8 @@ const refreshCart = async (userId) => {
         removeFromCart,
         clearCart,
         getTotalPrice,
-        getTotal
+        getTotal,
+        refreshCart, // ✅ now correctly included
       }}
     >
       {children}

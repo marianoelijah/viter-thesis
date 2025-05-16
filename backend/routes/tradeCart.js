@@ -1,5 +1,5 @@
 import express from 'express';
-import db from '../config/db.js'; // adjust path if needed
+import db from '../config/db.js'; // Adjust the path if needed
 
 const router = express.Router();
 
@@ -9,78 +9,89 @@ const router = express.Router();
  */
 router.post('/add', async (req, res) => {
   const { userId, productId, quantity } = req.body;
-  console.log("Request Body:", req.body); // Debug log
 
   if (!userId || !productId || !quantity) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
   try {
-    // Check if item already in trade cart
     const [existing] = await db.query(
-      'SELECT * FROM trade_cart WHERE user_id = ? AND product_id = ?',
+      'SELECT * FROM trade_cart WHERE buyer_id = ? AND product_id = ?',
       [userId, productId]
     );
 
     if (existing.length > 0) {
-      // Update quantity
       await db.query(
-        'UPDATE trade_cart SET quantity = quantity + ? WHERE user_id = ? AND product_id = ?',
+        'UPDATE trade_cart SET quantity = quantity + ? WHERE buyer_id = ? AND product_id = ?',
         [quantity, userId, productId]
       );
     } else {
-      // Insert new item
       await db.query(
-        'INSERT INTO trade_cart (user_id, product_id, quantity) VALUES (?, ?, ?)',
+        'INSERT INTO trade_cart (buyer_id, product_id, quantity) VALUES (?, ?, ?)',
         [userId, productId, quantity]
       );
     }
 
-    res.json({ message: 'Item added to trade cart' });
+    res.json({ message: '✅ Item added to trade cart' });
   } catch (err) {
-    console.error("Error adding to trade cart:", err); // Detailed logging
-    res.status(500).json({ message: 'Server error adding to trade cart', error: err.message });
+    console.error("❌ Error adding to trade cart:", err);
+    res.status(500).json({
+      message: 'Server error adding to trade cart',
+      error: err.message,
+    });
   }
 });
 
-
-/**
- * Get all trade cart items for a specific user
- * GET /api/tradecart/:userId
- */
+// Get trade cart items for a user
 router.get('/:userId', async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const [rows] = await db.query(
-      `SELECT tc.id, p.name, tc.quantity 
-       FROM trade_cart tc 
-       JOIN products p ON tc.product_id = p.id 
-       WHERE tc.user_id = ?`,
-      [userId]
-    );
+    const sql = `
+      SELECT tc.id, tc.quantity, p.name
+      FROM trade_cart tc
+      JOIN products p ON tc.product_id = p.id
+      WHERE tc.buyer_id = ?
+    `;
+    const [rows] = await db.query(sql, [userId]);
+
     res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Database fetch error' });
+  } catch (error) {
+    console.error('Error fetching trade cart items:', error);
+    res.status(500).json({ message: 'Failed to fetch trade cart items', error: error.message });
   }
 });
 
+
 /**
- * Checkout (clear trade cart and process trade)
+ * Checkout (clear trade cart)
  * POST /api/tradecart/checkout/:userId
  */
 router.post('/checkout/:userId', async (req, res) => {
   const { userId } = req.params;
 
   try {
-    // Here you would normally insert into a trades table, handle stock, etc.
-    await db.query('DELETE FROM trade_cart WHERE user_id = ?', [userId]);
+    // You could also log to a trades table here
+    await db.query('DELETE FROM trade_cart WHERE buyer_id = ?', [userId]);
     res.json({ message: '✅ Trade confirmed and cart cleared' });
   } catch (err) {
-    console.error(err);
+    console.error("❌ Error during checkout:", err);
     res.status(500).json({ message: '❌ Error confirming trade' });
   }
 });
+
+// DELETE a single item from the user's trade cart
+router.delete('/:userId/:itemId', async (req, res) => {
+  const { userId, itemId } = req.params;
+
+  try {
+    await db.query('DELETE FROM trade_cart WHERE id = ? AND buyer_id = ?', [itemId, userId]);
+    res.json({ message: '🗑️ Item removed from trade cart' });
+  } catch (err) {
+    console.error('❌ Error removing item from trade cart:', err);
+    res.status(500).json({ message: 'Server error while removing item' });
+  }
+});
+
 
 export default router;

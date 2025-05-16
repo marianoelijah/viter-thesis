@@ -45,17 +45,30 @@ const Trade = () => {
   }, []);
 
 const addToTradeCart = async (userId, productId, quantity) => {
+  console.log("addToTradeCart called with:", {
+    userId,  // Check if userId is hardcoded here
+    productId,
+    quantity
+  });
+
   try {
     const response = await axios.post('http://localhost:3000/api/tradecart/add', {
-      userId, 
-      productId, 
+      userId: 1,  // Hardcoded for testing
+      productId,
       quantity
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
-    console.log(response.data); // Successful response log
+
+    console.log("✅ Trade request successful:", response.data);
   } catch (error) {
-    console.error("Failed to request trade:", error.response ? error.response.data : error.message);
+    console.error("❌ Failed to request trade:", error.response ? error.response.data : error.message);
   }
-}
+};
+
+
   // Filter logic
   const currentDate = new Date();
   const filteredProducts = products.filter(product => {
@@ -130,40 +143,47 @@ const addToTradeCart = async (userId, productId, quantity) => {
     setTimeout(() => setShowSuggestions(false), 100);
   };
 
-  // Buy Now Handler (optional use, not in modal)
-const handleBuyNow = async (product) => {
-  const purchaseQuantity = quantities[product.id] || 1;
+//   // Buy Now Handler (optional use, not in modal)
+// const handleBuyNow = async (product) => {
+//   const purchaseQuantity = quantities[product.id] || 1;
 
-  if (product.availableStock < purchaseQuantity) {
-    toast.error("Not enough stock available.");
-    return;
-  }
+//   if (product.availableStock < purchaseQuantity) {
+//     toast.error("Not enough stock available.");
+//     return;
+//   }
 
-  try {
-    await axios.put(`http://localhost:3000/api/products/${product.id}/decrease-stock`, {
-      quantity: purchaseQuantity,
-    });
+//   try {
+//     await axios.put(`http://localhost:3000/api/products/${product.id}/decrease-stock`, {
+//       quantity: purchaseQuantity,
+//     });
 
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const existingItem = cart.find((item) => item.id === product.id);
+//     const cart = JSON.parse(localStorage.getItem("cart")) || [];
+//     const existingItem = cart.find((item) => item.id === product.id);
 
-    if (existingItem) {
-      existingItem.quantity += purchaseQuantity;
-    } else {
-      cart.push({ ...product, quantity: purchaseQuantity });
-    }
+//     if (existingItem) {
+//       existingItem.quantity += purchaseQuantity;
+//     } else {
+//       cart.push({ ...product, quantity: purchaseQuantity });
+//     }
 
-    localStorage.setItem("cart", JSON.stringify(cart));
+//     localStorage.setItem("cart", JSON.stringify(cart));
 
-    fetchProducts();
+//     fetchProducts();
 
-    toast.success(`${product.name} purchased!`);
-    navigate("/tradecart");
-  } catch (error) {
-    console.error("Purchase error:", error);
-    toast.error("Purchase failed.");
-  }
-};
+//     toast.success(`${product.name} purchased!`);
+//     navigate("/tradecart");
+//   } catch (error) {
+//     console.error("Purchase error:", error);
+//     toast.error("Purchase failed.");
+//   }
+// };
+
+  // Helper function to generate a random shop name
+  const generateRandomShopName = () => {
+    const shopNames = ["GreenFarmers", "FarmFresh", "AgriMarket", "HarvestHub", "EcoVeggies"];
+    return shopNames[Math.floor(Math.random() * shopNames.length)];
+  };
+
 
 
   // Dummy recommended logic (same category)
@@ -245,22 +265,35 @@ const handleBuyNow = async (product) => {
               key={product.id}
               onClick={() => setModalProduct(product)}
               className="border rounded-lg p-4 shadow-md hover:shadow-lg transition bg-white"
-            >
-             <img
-              src={`http://localhost:3000/uploads/${product.image}`}
-              alt={product.name}
-              className="w-full h-40 object-cover rounded-md mb-4"
-            />
+              >
+              <img
+                src={`http://localhost:3000/uploads/${product.image}`}
+                alt={product.name}
+                className="w-full h-40 object-cover rounded-md mb-4"
+              />
               <h2 className="text-xl font-semibold">{product.name}</h2>
               <p className="text-gray-500">{product.category}</p>
-              <span className="text-green-600">In stock: {product.availableStock}</span>
-              <p>
-                <span className="font-semibold">Shop:</span> {product.shop}
+              <p className="text-gray-600">
+                {`Available Stock: ${product.availableStock || 0}`}
               </p>
+              <p className="text-sm text-gray-600">{`Sold by: ${generateRandomShopName()}`}</p> {/* Random shop name */}
+              <div className="flex justify-between items-center mt-4">
+                {user && (
+  <button
+    onClick={() => addToTradeCart(user.id, product.id, 1)}
+    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+  >
+    Add to Trade Cart
+  </button>
+)}
+
+              </div>
             </div>
           ))
         ) : (
-          <p>No products found.</p>
+          <div className="col-span-full text-center text-xl text-gray-600">
+            No products found.
+          </div>
         )}
       </div>
 {/* Pagination Controls */}

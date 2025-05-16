@@ -14,6 +14,25 @@ const keywordToCategory = {
   vegetable: "Vegetable",
 };
 
+const randomShops = [
+  "GreenGrow Mart",
+  "Harvest Hub",
+  "Farm Fresh Co.",
+  "AgriVille",
+  "Nature's Basket",
+  "Veggie Valley",
+  "Organic Roots",
+  "Bayanihan Market",
+  "Tanim Lokal",
+  "The Giving Grove"
+];
+
+const getRandomShop = () => {
+  const index = Math.floor(Math.random() * randomShops.length);
+  return randomShops[index];
+};
+
+
 const Donate = () => {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState("All");
@@ -29,20 +48,59 @@ const Donate = () => {
   const { addToCart } = useContext(CartContext);
 
   const itemsPerPage = 9;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+const closeModal = () => {
+  setIsModalOpen(false);
+};
+
 
   // Fetch products
   const fetchProducts = async () => {
     try {
       const res = await axios.get("http://localhost:3000/api/products");
-      setProducts(res.data);
-    } catch (err) {
-      console.error("Failed to fetch products", err);
-    }
+       const productsWithShops = res.data.map(product => ({
+      ...product,
+      shopName: getRandomShop()
+    }));
+    setProducts(productsWithShops);
+  } catch (err) {
+    console.error("Failed to fetch products", err);
+  }
   };
 
   useEffect(() => {
     fetchProducts();
   }, []);
+
+
+const handleDonate = async (product) => {
+  try {
+    const buyerId = 1; // Replace with actual logged-in ID
+
+    const donationData = {
+      product_id: product.id,
+      buyer_id: buyerId,
+      quantity: 1,
+    };
+
+    console.log("Sending donation data:", donationData);
+
+    await axios.post("http://localhost:3000/api/donation-request", donationData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    alert("Donation request sent!");
+    closeModal();
+  } catch (err) {
+    console.error("Error requesting donation:", err);
+    alert("Error requesting donation.");
+  }
+};
+
+
 
   // Filter logic
   const currentDate = new Date();
@@ -116,41 +174,6 @@ const Donate = () => {
 
   const handleInputBlur = () => {
     setTimeout(() => setShowSuggestions(false), 100);
-  };
-
-  // Buy Now Handler (optional use, not in modal)
-  const handleBuyNow = async (product) => {
-    const purchaseQuantity = quantities[product.id] || 1;
-
-    if (product.availableStock < purchaseQuantity) {
-      toast.error("Not enough stock available.");
-      return;
-    }
-
-    try {
-      await axios.put(`http://localhost:3000/api/products/${product.id}/decrease-stock`, {
-        quantity: purchaseQuantity,
-      });
-
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const existingItem = cart.find((item) => item.id === product.id);
-
-      if (existingItem) {
-        existingItem.quantity += purchaseQuantity;
-      } else {
-        cart.push({ ...product, quantity: purchaseQuantity });
-      }
-
-      localStorage.setItem("cart", JSON.stringify(cart));
-
-      fetchProducts();
-
-      toast.success(`${product.name} purchased!`);
-      navigate("/cart");
-    } catch (error) {
-      console.error("Purchase error:", error);
-      toast.error("Purchase failed.");
-    }
   };
 
   // Dummy recommended logic (same category)
@@ -241,9 +264,8 @@ const Donate = () => {
               <h2 className="text-xl font-semibold">{product.name}</h2>
               <p className="text-gray-500">{product.category}</p>
               <span className="text-green-600">In stock: {product.availableStock}</span>
-              <p>
-                <span className="font-semibold">Donor:</span> {product.donor}
-              </p>
+              <p className="text-sm text-gray-500">Shop: {product.shopName}</p>
+              
             </div>
           ))
         ) : (
@@ -285,13 +307,13 @@ const Donate = () => {
               <img src={`http://localhost:3000/uploads/${modalProduct.image}`} alt={modalProduct.name} className="w-full h-full object-cover rounded-lg" />
             </div>
 
-            <div className="w-1/2 flex flex-col justify-between">
+            <div className="w-1/2 flex flex-col">
               <div>
                 <h2 className="text-3xl font-bold mb-2">{modalProduct.name}</h2>
                 <p className="text-gray-700 mb-3">{modalProduct.description}</p>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">Stock: {modalProduct.availableStock}</span>
-                  <span className="text-sm text-gray-500">Seller: {modalProduct.seller}</span>
+                  <span className="text-sm text-gray-500">Shop: {modalProduct.shop}</span>
                 </div>
               </div>
 
@@ -315,15 +337,11 @@ const Donate = () => {
                     >
                       <h6 className="font-bold text-sm">{item.name}</h6>
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addToCart(item);
-                          toast.success(`${item.name} added to cart!`);
-                        }}
-                        className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-                      >
-                        Add to Cart
-                      </button>
+                  onClick={() => handleDonate(modalProduct)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm rounded-lg font-semibold"
+                >
+                  Request Donation
+                </button>
                     </div>
                   ))}
                 </div>
