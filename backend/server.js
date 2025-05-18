@@ -8,7 +8,7 @@ import mysql from 'mysql2/promise';
 // Route imports
 import productsRoutes from './routes/products.js';
 import authRoutes from './routes/authRoutes.js';
-import donationRoutes from './routes/donationRoutes.js';
+import donationsRoutes from './routes/donations.js';
 import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import tradeRouter from './routes/tradeRoutes.js';
@@ -70,10 +70,9 @@ app.get('/', (req, res) => res.send('CORS is enabled!'));
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/trade', tradeRouter);
-app.use('/api/donation', donationRoutes);
+app.use('/api/donations', donationsRoutes);
 app.use('/api/orders2', orderRoutes);  // For checkout/order handling
 app.use(productRoutes); // For product handling
-app.use(donationRoutes);
 app.use(sellerProfileRoutes);
 app.use('/api/tradecart', tradeCartRoutes);
 

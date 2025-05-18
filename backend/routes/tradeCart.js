@@ -43,24 +43,25 @@ router.post('/add', async (req, res) => {
 });
 
 // Get trade cart items for a user
-router.get('/:userId', async (req, res) => {
+router.get('/api/tradecart/:userId', (req, res) => {
   const { userId } = req.params;
 
-  try {
-    const sql = `
-      SELECT tc.id, tc.quantity, p.name
-      FROM trade_cart tc
-      JOIN products p ON tc.product_id = p.id
-      WHERE tc.buyer_id = ?
-    `;
-    const [rows] = await db.query(sql, [userId]);
+  const query = `
+    SELECT tc.id, tc.quantity, p.name
+    FROM trade_cart tc
+    JOIN products p ON tc.product_id = p.id
+    WHERE tc.user_id = ?
+  `;
 
-    res.json(rows);
-  } catch (error) {
-    console.error('Error fetching trade cart items:', error);
-    res.status(500).json({ message: 'Failed to fetch trade cart items', error: error.message });
-  }
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error('Failed to fetch trade cart:', err);
+      return res.status(500).json({ error: 'Failed to fetch trade cart' });
+    }
+    res.json(results);
+  });
 });
+
 
 
 /**

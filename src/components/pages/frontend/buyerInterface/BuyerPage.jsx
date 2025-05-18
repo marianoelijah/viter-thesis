@@ -330,11 +330,6 @@ const BuyerPage = () => {
               >
                 {modalProduct.availableStock <= 0 ? "Out of Stock" : "Add to Cart"}
               </button>
-            </div>
-
-            {/* Recommended Products */}
-            <div className="grid grid-cols-2 sm:grid-cols-2 gap-4 absolute bottom-[-10rem] left-0 right-0 mx-auto w-full px-6">
-              <div className="col-span-full mt-10">
                 <h3 className="text-xl font-bold mb-4">Recommended Products:</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {getRecommendedProducts().map((item) => (
@@ -358,7 +353,6 @@ const BuyerPage = () => {
                     </div>
                   ))}
                 </div>
-              </div>
             </div>
 
           </div>

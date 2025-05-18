@@ -1,10 +1,9 @@
- import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import React, { useState, useContext, useEffect } from "react";
 import { CartContext } from "@/components/context/CartContext";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 import toast from "react-hot-toast";
 import axios from 'axios';
-import { AuthContext } from '@/context/AuthContext';
 
 const keywordToCategory = {
   fruits: "Fruits",
@@ -15,59 +14,49 @@ const keywordToCategory = {
   vegetable: "Vegetable",
 };
 
+const fakeShops = [
+  "AgriMart PH", "Green Basket", "Fresh Roots Co.", "Harvest & Co.",
+  "Tanim Express", "EcoFarms", "Bayanihan Market", "Grow & Go"
+];
+
+
 const Trade = () => {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState("All");
   const [query, setQuery] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
   const [modalProduct, setModalProduct] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [quantities, setQuantities] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const { user } = useContext(AuthContext);
+
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
 
   const itemsPerPage = 9;
 
   // Fetch products
- useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await axios.get('http://localhost:3000/api/products');
-        setProducts(res.data);
-      } catch (err) {
-        console.error('Failed to fetch products:', err);
-      }
-    };
+  const fetchProducts = async () => {
+    try {
+    const res = await axios.get("http://localhost:3000/api/products");
+    const productsWithShop = res.data.map(product => ({
+      ...product,
+      shop: product.shop || fakeShops[Math.floor(Math.random() * fakeShops.length)]
+    }));
+    setProducts(productsWithShop);
+  } catch (err) {
+    console.error("Failed to fetch products", err);
+  }
+  };
+
+  useEffect(() => {
     fetchProducts();
   }, []);
 
-const addToTradeCart = async (userId, productId, quantity) => {
-  console.log("addToTradeCart called with:", {
-    userId,  // Check if userId is hardcoded here
-    productId,
-    quantity
-  });
-
-  try {
-    const response = await axios.post('http://localhost:3000/api/tradecart/add', {
-      userId: 1,  // Hardcoded for testing
-      productId,
-      quantity
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-
-    console.log("✅ Trade request successful:", response.data);
-  } catch (error) {
-    console.error("❌ Failed to request trade:", error.response ? error.response.data : error.message);
-  }
-};
-
+  
 
   // Filter logic
   const currentDate = new Date();
@@ -86,12 +75,14 @@ const addToTradeCart = async (userId, productId, quantity) => {
       const matchedCategory = keywordToCategory[lowerQuery];
       if (!matchedCategory || matchedCategory !== product.category) return false;
     }
+    if (minPrice && product.price < parseFloat(minPrice)) return false;
+    if (maxPrice && product.price > parseFloat(maxPrice)) return false;
     if (!product.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
     if (product.availableStock <= 0) return false;
     return true;
   });
 
-  const uniqueCategories = ["All", ...new Set(products.map(p => p.category))];
+  const uniqueCategories = ["All", ...Array.from(new Set(products.map(p => p.category)))];
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -134,57 +125,49 @@ const addToTradeCart = async (userId, productId, quantity) => {
   };
 
   const handleInputFocus = () => {
-  if (Array.isArray(suggestions) && suggestions.length > 0) {
-    setShowSuggestions(true);
-  }
-};
+    if (suggestions.length > 0) {
+      setShowSuggestions(true);
+    }
+  };
 
   const handleInputBlur = () => {
     setTimeout(() => setShowSuggestions(false), 100);
   };
 
-//   // Buy Now Handler (optional use, not in modal)
-// const handleBuyNow = async (product) => {
-//   const purchaseQuantity = quantities[product.id] || 1;
+  // Buy Now Handler (optional use, not in modal)
+  const handleBuyNow = async (product) => {
+    const purchaseQuantity = quantities[product.id] || 1;
 
-//   if (product.availableStock < purchaseQuantity) {
-//     toast.error("Not enough stock available.");
-//     return;
-//   }
+    if (product.availableStock < purchaseQuantity) {
+      toast.error("Not enough stock available.");
+      return;
+    }
 
-//   try {
-//     await axios.put(`http://localhost:3000/api/products/${product.id}/decrease-stock`, {
-//       quantity: purchaseQuantity,
-//     });
+    try {
+      await axios.put(`http://localhost:3000/api/products/${product.id}/decrease-stock`, {
+        quantity: purchaseQuantity,
+      });
 
-//     const cart = JSON.parse(localStorage.getItem("cart")) || [];
-//     const existingItem = cart.find((item) => item.id === product.id);
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const existingItem = cart.find((item) => item.id === product.id);
 
-//     if (existingItem) {
-//       existingItem.quantity += purchaseQuantity;
-//     } else {
-//       cart.push({ ...product, quantity: purchaseQuantity });
-//     }
+      if (existingItem) {
+        existingItem.quantity += purchaseQuantity;
+      } else {
+        cart.push({ ...product, quantity: purchaseQuantity });
+      }
 
-//     localStorage.setItem("cart", JSON.stringify(cart));
+      localStorage.setItem("cart", JSON.stringify(cart));
 
-//     fetchProducts();
+      fetchProducts();
 
-//     toast.success(`${product.name} purchased!`);
-//     navigate("/tradecart");
-//   } catch (error) {
-//     console.error("Purchase error:", error);
-//     toast.error("Purchase failed.");
-//   }
-// };
-
-  // Helper function to generate a random shop name
-  const generateRandomShopName = () => {
-    const shopNames = ["GreenFarmers", "FarmFresh", "AgriMarket", "HarvestHub", "EcoVeggies"];
-    return shopNames[Math.floor(Math.random() * shopNames.length)];
+      toast.success(`${product.name} purchased!`);
+      navigate("/cart");
+    } catch (error) {
+      console.error("Purchase error:", error);
+      toast.error("Purchase failed.");
+    }
   };
-
-
 
   // Dummy recommended logic (same category)
   const getRecommendedProducts = () => {
@@ -198,7 +181,7 @@ const addToTradeCart = async (userId, productId, quantity) => {
       )
       .slice(0, 4);
   };
-                                                                                       
+
   return (
     <div className="min-h-screen bg-green-100 p-6 relative">
       {/* Top Nav */}
@@ -206,7 +189,7 @@ const addToTradeCart = async (userId, productId, quantity) => {
         <button onClick={() => navigate(-1)} className="flex items-center text-gray-700 hover:text-green-600">
           <ArrowLeft className="mr-2" /> Back
         </button>
-        <Link to="/tradecart" className="relative">
+        <Link to="/cart" className="relative">
           <ShoppingCart className="w-7 h-7 text-black hover:text-green-600" />
         </Link>
       </div>
@@ -254,6 +237,21 @@ const addToTradeCart = async (userId, productId, quantity) => {
               <option key={idx} value={cat}>{cat}</option>
             ))}
           </select>
+
+          <input
+            type="number"
+            placeholder="Min Price"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+            className="w-full px-4 py-2 border border-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+          <input
+            type="number"
+            placeholder="Max Price"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            className="w-full px-4 py-2 border border-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
         </div>
       </div>
 
@@ -265,7 +263,7 @@ const addToTradeCart = async (userId, productId, quantity) => {
               key={product.id}
               onClick={() => setModalProduct(product)}
               className="border rounded-lg p-4 shadow-md hover:shadow-lg transition bg-white"
-              >
+            >
               <img
                 src={`http://localhost:3000/uploads/${product.image}`}
                 alt={product.name}
@@ -273,122 +271,101 @@ const addToTradeCart = async (userId, productId, quantity) => {
               />
               <h2 className="text-xl font-semibold">{product.name}</h2>
               <p className="text-gray-500">{product.category}</p>
-              <p className="text-gray-600">
-                {`Available Stock: ${product.availableStock || 0}`}
-              </p>
-              <p className="text-sm text-gray-600">{`Sold by: ${generateRandomShopName()}`}</p> {/* Random shop name */}
-              <div className="flex justify-between items-center mt-4">
-                {user && (
-  <button
-    onClick={() => addToTradeCart(user.id, product.id, 1)}
-    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-  >
-    Add to Trade Cart
-  </button>
-)}
-
-              </div>
+              <p className="text-green-600 font-bold mt-2">₱{product.price}</p>
+              <p className="text-gray-600 text-sm mt-2">{product.description}</p>
+              <span className="text-green-600">In stock: {product.availableStock}</span>
+              <p><span className="font-semibold">Shop:</span> {product.shop}</p>
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center text-xl text-gray-600">
-            No products found.
-          </div>
+          <p>No products found.</p>
         )}
       </div>
-{/* Pagination Controls */}
-{totalPages > 1 && (
-  <div className="flex justify-center items-center mt-6 flex-wrap gap-2">
-    <button 
-      onClick={handlePrevPage} 
-      disabled={currentPage === 1} 
-      className="px-3 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">
-      Prev
-    </button>
-    
-    {[...Array(totalPages)].map((_, index) => {
-      const pageNum = index + 1;
-      return (
-        <button
-          key={pageNum}
-          onClick={() => setCurrentPage(pageNum)}
-          className={`px-3 py-2 rounded border ${currentPage === pageNum ? "bg-green-500 text-white" : "bg-white hover:bg-gray-100"}`}
-        >
-          {pageNum}
-        </button>
-      );
-    })}
 
-    <button 
-      onClick={handleNextPage} 
-      disabled={currentPage === totalPages} 
-      className="px-3 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">
-      Next
-    </button>
-  </div>
-)}
-
-{/* Modal */}
-{modalProduct && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white rounded-xl shadow-lg max-w-4xl w-full p-6 relative flex gap-6">
-      <button onClick={() => setModalProduct(null)} className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-xl font-bold">×</button>
-
-      <div className="w-1/2">
-        <img 
-          src={`http://localhost:3000/uploads/${modalProduct.image}`} 
-          alt={modalProduct.name} 
-          className="w-full h-full object-cover rounded-lg" 
-        />
-      </div>
-
-      <div className="w-1/2 flex flex-col justify-between">
-        <div>
-          <h2 className="text-3xl font-bold mb-2">{modalProduct.name}</h2>
-          <p className="text-gray-700 mb-3">{modalProduct.description}</p>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-500">Stock: {modalProduct.availableStock}</span>
-            <span className="text-sm text-gray-500">Shop: {modalProduct.shop}</span>
-          </div>
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-6 flex-wrap gap-2">
+          <button onClick={handlePrevPage} disabled={currentPage === 1} className="px-3 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">
+            Prev
+          </button>
+          {[...Array(totalPages)].map((_, index) => {
+            const pageNum = index + 1;
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentPage(pageNum)}
+                className={`px-3 py-2 rounded border ${currentPage === pageNum ? "bg-green-500 text-white" : "bg-white hover:bg-gray-100"}`}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          <button onClick={handleNextPage} disabled={currentPage === totalPages} className="px-3 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">
+            Next
+          </button>
         </div>
-        
-        <button
-          onClick={() => addToTradeCart(user.id, modalProduct.id, 1)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Request to Trade
-        </button>
+      )}
 
-        <h3 className="text-xl font-bold">Recommended Products:</h3>
-        <div className="grid grid-cols-2 gap-4">
-          {getRecommendedProducts().map((item) => (
-            <div
-              key={item.id}
-              onClick={() => setModalProduct(item)}
-              className="border p-4 rounded-lg text-center transform transition hover:scale-105 hover:shadow-md"
-            >
-              <h6 className="font-bold text-sm">{item.name}</h6>
+      {/* Modal */}
+      {modalProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-lg max-w-4xl w-full p-6 relative flex gap-6">
+            <button onClick={() => setModalProduct(null)} className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-xl font-bold">×</button>
+
+            <div className="w-1/2">
+              <img src={`http://localhost:3000/uploads/${modalProduct.image}`} alt={modalProduct.name} className="w-full h-full object-cover rounded-lg" />
+            </div>
+
+            <div className="w-1/2 flex flex-col justify-between">
+              <div>
+                <h2 className="text-3xl font-bold mb-2">{modalProduct.name}</h2>
+                <p className="text-gray-700 mb-3">{modalProduct.description}</p>
+                <p className="text-green-600 font-bold text-2xl mb-4">₱{modalProduct.price}</p>
+                <div className="flex justify-between items-center mb-6">
+                  <span className="text-sm text-gray-500">Stock: {modalProduct.availableStock}</span>
+                  <span className="text-sm text-gray-500">Shop: {modalProduct.shop}</span>
+                </div>
+              </div>
 
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addToCart(item);
-                  toast.success(`${item.name} added to trade cart!`);
+                onClick={() => {
+                  addToCart(modalProduct);
+                  toast.success(`${modalProduct.name} added to cart!`);
                 }}
-                className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+                disabled={modalProduct.availableStock <= 0}
+                className={`mt-auto px-4 py-2 rounded text-white w-full ${modalProduct.availableStock <= 0 ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 hover:bg-green-600"}`}
               >
-                Add to Trade Cart
+                {modalProduct.availableStock <= 0 ? "Out of Stock" : "Add to Cart"}
               </button>
+                <h3 className="text-xl font-bold mb-4">Recommended Products:</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {getRecommendedProducts().map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => setModalProduct(item)}
+                      className="border p-4 rounded-lg text-center transform transition hover:scale-105 hover:shadow-md"
+                    >
+                      <h6 className="font-bold text-sm">{item.name}</h6>
+                      <p className="text-sm text-gray-500">₱{item.price}</p>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addToCart(item);
+                          toast.success(`${item.name} added to cart!`);
+                        }}
+                        className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  ))}
+                </div>
             </div>
-          ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
-  </div>
-)}
-</div>
-  )
-}
-
+  );
+};
 
 export default Trade;

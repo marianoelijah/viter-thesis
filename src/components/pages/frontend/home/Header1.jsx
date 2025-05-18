@@ -35,6 +35,12 @@ const Header1 = () => {
                   <Link to="/seller/profile">
                     <User className="w-6 h-6 text-white" />
                   </Link>
+                  <Link to="/home/donate">
+                   <button className="bg-white text-green-700 hover:bg-yellow-300 font-bold px-4 py-2 rounded">
+                      Donate Now
+                   </button>
+                  </Link>
+
                   {/* Logout Button */}
               <button
                 onClick={handleLogout}
@@ -73,6 +79,14 @@ const Header1 = () => {
               <span>Cart</span>
               <span className="bg-red-500 text-white text-xs px-1.5 rounded-full">3</span>
             </Link>
+            <Link
+             to="/donate/add"
+             onClick={closeMenu}
+            className="bg-white text-green-700 hover:bg-yellow-300 text-center font-bold px-4 py-2 rounded"
+             >
+              Donate Now
+            </Link>
+
           </nav>
         </div>
       )}

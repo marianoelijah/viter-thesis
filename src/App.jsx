@@ -12,7 +12,7 @@ import Cart from "./components/pages/frontend/home/Cart";
 import Cashout from "./components/pages/frontend/home/Cashout";
 import Confirmation from "./components/pages/frontend/home/Confirmation";
 import Trade from './components/pages/frontend/Trades/Trade'; // ✅ Correct for default export
-import Donate from "./components/pages/frontend/Trades/Donate";
+import Donate from "./components/pages/frontend/Donation/Donate";
 import Login from "./components/pages/frontend/authentication/Login";
 import Register from "./components/pages/frontend/authentication/Register";
 import SellerPage from "./components/pages/frontend/sellerInterface/SellerPage";
@@ -35,7 +35,8 @@ import { Toaster } from 'react-hot-toast';
 import CashoutTrade from "./components/pages/frontend/Trades/CashoutTrade";
 import OrderDetails from "./components/pages/frontend/buyerInterface/OrderDetails.jsx";
 import { CartProvider } from "./components/context/CartContext";
-
+import ViewDonation from "./components/pages/frontend/Donation/ViewDonation";
+import AddDonationListing from "./components/pages/frontend/Donation/AddDonationListing";
 
 const App = () => {
   const [cart, setCart] = useState([]);
@@ -71,6 +72,9 @@ const App = () => {
               <Route path="/tradecart" element={<TradeCart />} />
               <Route path="/donationform" element={<UploadDonationForm />} />
               <Route path="/cashout-trade" element={<CashoutTrade />} />
+              <Route path="/viewdonations" element={<ViewDonation />} />
+              <Route path="/donate/add" element={<AddDonationListing />} />
+
 
               <Route path="/order/:id" element={<OrderDetails />} />
 

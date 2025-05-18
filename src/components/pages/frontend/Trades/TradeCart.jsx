@@ -4,29 +4,31 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trash2 } from "lucide-react";
 
 const TradeCart = () => {
-  const { user } = useContext(AuthContext); // get logged-in user
+  const { user } = useContext(AuthContext);
   const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigate();
 
-  // ✅ Fetch trade cart items
   useEffect(() => {
-    const fetchTradeCart = async () => {
-      if (!user?.id) return;
+  const fetchTradeCart = async () => {
+    if (!user?.id) return;
 
-      try {
-        const res = await fetch(`http://localhost:3000/api/tradecart/${user.id}`);
-        const data = await res.json();
-        console.log("Fetched cart:", data);
-        setCartItems(data); // You confirmed this is already the item array
-      } catch (err) {
-        console.error('Error fetching trade cart:', err);
-      }
-    };
+    try {
+      const res = await fetch(`http://localhost:3000/api/tradecart/${user.id}`);
+      const data = await res.json();
 
-    fetchTradeCart();
-  }, [user]);
+      // ⬇️ ADD THIS to inspect the shape of the data from the backend
+      console.log('Fetched Trade Cart Data:', data);
 
-  // ✅ Remove item from trade cart
+      setCartItems(data);
+    } catch (err) {
+      console.error('Error fetching trade cart:', err);
+    }
+  };
+
+  fetchTradeCart();
+}, [user]);
+
+
   const removeFromCart = async (itemId) => {
     try {
       const res = await fetch(`http://localhost:3000/api/tradecart/${user.id}/${itemId}`, {
@@ -34,8 +36,6 @@ const TradeCart = () => {
       });
       const data = await res.json();
       alert(data.message);
-
-      // Update UI after deletion
       setCartItems(prev => prev.filter(item => item.id !== itemId));
     } catch (err) {
       console.error('Error removing item:', err);
@@ -43,7 +43,6 @@ const TradeCart = () => {
     }
   };
 
-  // ✅ Confirm trade
   const confirmTrade = async () => {
     try {
       const res = await fetch(`http://localhost:3000/api/tradecart/checkout/${user.id}`, {
@@ -51,7 +50,7 @@ const TradeCart = () => {
       });
       const data = await res.json();
       alert(data.message);
-      setCartItems([]); // Clear cart visually
+      setCartItems([]);
     } catch (err) {
       console.error('Trade confirmation failed:', err);
       alert('Trade confirmation failed.');
@@ -59,41 +58,53 @@ const TradeCart = () => {
   };
 
   return (
-    <div className="p-6">
-      <button onClick={() => navigate(-1)} className="flex items-center text-gray-700 hover:text-green-600">
-        <ArrowLeft className="mr-2" /> Back
-      </button>
-      <h2 className="text-xl font-bold mb-4">Trade Cart</h2>
+    <div className="min-h-screen bg-gradient-to-br from-green-100 to-white py-8 px-4 md:px-12 lg:px-24">
+      <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-6">
+        <div className="flex items-center mb-6">
+          <button onClick={() => navigate(-1)} className="flex items-center text-gray-600 hover:text-green-600">
+            <ArrowLeft className="mr-2" />
+            Back
+          </button>
+        </div>
 
-      {cartItems.length === 0 ? (
-        <p>Your trade cart is empty.</p>
-      ) : (
-        <ul className="space-y-4">
-          {cartItems.map((item) => (
-            <li key={item.id} className="p-4 border rounded shadow flex justify-between items-center">
-              <div>
-                <p><strong>Product:</strong> {item.name}</p>
-                <p><strong>Quantity:</strong> {item.quantity}</p>
-              </div>
-              <button
-                onClick={() => removeFromCart(item.id)}
-                className="text-red-500 hover:text-red-700"
+        <h2 className="text-2xl font-bold text-green-700 mb-6 text-center">🛒 Trade Cart</h2>
+
+        {cartItems.length === 0 ? (
+          <p className="text-gray-500 text-center">Your trade cart is currently empty.</p>
+        ) : (
+          <ul className="space-y-4">
+            {cartItems.map((item) => (
+              <li
+                key={item.id}
+                className="p-4 bg-gray-50 rounded-lg shadow-sm flex justify-between items-center hover:shadow-md transition"
               >
-                <Trash2 />
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+                <div>
+                  <p className="text-lg font-semibold text-gray-800">{item.name}</p>
+                  <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                </div>
+                <button
+                  onClick={() => removeFromCart(item.id)}
+                  className="text-red-500 hover:text-red-700 transition"
+                  title="Remove"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
-      {cartItems.length > 0 && (
-        <button
-          onClick={confirmTrade}
-          className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-        >
-          Confirm Trade
-        </button>
-      )}
+        {cartItems.length > 0 && (
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={confirmTrade}
+              className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition"
+            >
+              ✅ Confirm Trade
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

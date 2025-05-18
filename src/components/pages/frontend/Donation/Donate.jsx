@@ -200,52 +200,61 @@ const handleDonate = async (product) => {
           <ShoppingCart className="w-7 h-7 text-black hover:text-green-600" />
         </Link>
       </div>
+      
 
       {/* Title */}
       <h1 className="text-4xl font-bold text-center text-green-800 mb-2">Welcome, Buyer!</h1>
       <p className="text-center text-xl text-gray-600 mb-8">Browse and Donate farm products below.</p>
 
-      {/* Filters */}
-      <div className="w-full max-w-6xl mx-auto px-4 mb-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Search Input */}
-          <div className="relative col-span-1">
-            <input
-              type="text"
-              placeholder="🔍 Search by product or category..."
-              value={query}
-              onChange={handleInputChange}
-              onFocus={handleInputFocus}
-              onBlur={handleInputBlur}
-              className="w-full px-4 py-2 border border-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-            {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute left-0 right-0 top-full bg-white border border-black rounded mt-1 shadow-lg z-10">
-                {suggestions.map((product) => (
-                  <div
-                    key={product.id}
-                    onMouseDown={() => handleSuggestionClick(product.name)}
-                    className="px-4 py-2 hover:bg-green-100 cursor-pointer"
-                  >
-                    {product.name}
-                  </div>
-                ))}
+   {/* Filters */}
+  <div className="max-w-7xl mx-auto bg-white p-4 rounded-xl shadow-md mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Search */}
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="🔍 Search by product or category..."
+          value={query}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="absolute left-0 right-0 top-full bg-white border border-gray-300 rounded mt-1 shadow-lg z-10">
+            {suggestions.map((product) => (
+              <div
+                key={product.id}
+                onMouseDown={() => handleSuggestionClick(product.name)}
+                className="px-4 py-2 hover:bg-green-100 cursor-pointer"
+              >
+                {product.name}
               </div>
-            )}
-          </div>
-
-          {/* Filters */}
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-4 py-2 border border-black rounded-lg shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-          >
-            {uniqueCategories.map((cat, idx) => (
-              <option key={idx} value={cat}>{cat}</option>
             ))}
-          </select>
-        </div>
+          </div>
+        )}
       </div>
+
+      {/* Category Filter */}
+      <select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+      >
+        {uniqueCategories.map((cat, idx) => (
+          <option key={idx} value={cat}>{cat}</option>
+        ))}
+      </select>
+
+      {/* Add Listing */}
+      <Link
+        to="/donate/add"
+        className="bg-green-600 text-white px-4 py-2 rounded-lg text-center hover:bg-green-700 transition"
+      >
+        + Add Donation Listing
+      </Link>
+    </div>
+  </div>
 
       {/* Product Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
