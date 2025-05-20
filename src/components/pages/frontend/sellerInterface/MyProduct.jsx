@@ -98,9 +98,9 @@ const MyProduct = () => {
         </button>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-lg shadow">
+      <div className="overflow-x-auto bg-gray-200 rounded-lg shadow border border-black">
         <table className="min-w-full table-auto">
-          <thead className="bg-green-100 text-green-900">
+          <thead className="bg-green-100 text-green-900 border border-black">
             <tr>
               <th className="px-6 py-3 text-left text-sm font-semibold">Product Name</th>
               <th className="px-6 py-3 text-left text-sm font-semibold">Category</th>
@@ -113,7 +113,7 @@ const MyProduct = () => {
 
           {productList.length > 0 ? (
               productList.map((product) => (
-                <tr key={product.id} className="hover:bg-gray-50">
+                <tr key={product.id} className="hover:bg-gray-50 border border-black">
                   <td className="px-6 py-4">
                     {editProductId === product.id ? (
                       <input

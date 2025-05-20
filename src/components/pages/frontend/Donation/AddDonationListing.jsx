@@ -12,7 +12,7 @@ function AddDonationListing() {
     availableStock: "",
     category: "",
     image: null,
-    type: "donation", // important
+    type: "donation",
   });
 
   const handleChange = (e) => {
@@ -27,7 +27,6 @@ function AddDonationListing() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
     if (
       !donationData.productName ||
       donationData.quantity <= 0 ||
@@ -43,10 +42,10 @@ function AddDonationListing() {
     }
 
     try {
-     const res = await fetch("http://localhost:3000/api/donations", {
-  method: "POST",
-  body: formData,
-});
+      const res = await fetch("http://localhost:3000/api/donations", {
+        method: "POST",
+        body: formData,
+      });
 
       if (res.ok) {
         alert("Donation item listed!");
@@ -71,76 +70,77 @@ function AddDonationListing() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-100 via-white to-green-200 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-3xl bg-white shadow-xl rounded-3xl p-10 transition-transform hover:scale-[1.01]">
-        <button
-          onClick={() => navigate(-1)}
-          className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md"
-        >
-          ← Back
-        </button>
+      <div className="w-full max-w-3xl bg-white shadow-2xl rounded-3xl p-10">
+        {/* Navigation Buttons */}
+        <div className="flex justify-between mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg transition"
+          >
+            ← Back
+          </button>
+          <button
+            onClick={() => navigate("/viewdonations")}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
+          >
+            View My Donations →
+          </button>
+        </div>
+
         <h1 className="text-4xl font-extrabold text-green-700 mb-8 text-center">
           Add Donation Listing
         </h1>
+
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Donation Name */}
+          {/* Item Name */}
           <div>
-            <label className="block mb-2 font-medium text-gray-700">
-              Donation Item Name
-            </label>
+            <label className="block mb-2 text-gray-700 font-semibold">Donation Item Name</label>
             <input
               type="text"
-               name="productName"
+              name="productName"
               value={donationData.productName}
               onChange={handleChange}
-              className="w-full p-3 border-black border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
               placeholder="e.g. Extra Squash"
+              className="w-full p-3 border rounded-xl border-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block mb-2 font-medium text-gray-700">
-              Description
-            </label>
+            <label className="block mb-2 text-gray-700 font-semibold">Description</label>
             <textarea
               name="description"
               value={donationData.description}
               onChange={handleChange}
-              className="w-full p-3 border-black border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
               rows="4"
               placeholder="Brief details about this donation"
+              className="w-full p-3 border rounded-xl border-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
           </div>
 
+          {/* Quantity and Stock */}
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Quantity */}
             <div>
-              <label className="block mb-2 font-medium text-gray-700">
-                Quantity
-              </label>
+              <label className="block mb-2 text-gray-700 font-semibold">Quantity</label>
               <input
                 type="number"
                 name="quantity"
                 value={donationData.quantity}
                 onChange={handleChange}
-                className="w-full p-3 border-black border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
+                className="w-full p-3 border rounded-xl border-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400"
                 required
               />
             </div>
-
-            {/* Stock */}
             <div>
-              <label className="block mb-2 font-medium text-gray-700">
-                Stock Available
-              </label>
+              <label className="block mb-2 text-gray-700 font-semibold">Stock Available</label>
               <input
                 type="number"
                 name="availableStock"
                 value={donationData.availableStock}
                 onChange={handleChange}
-                className="w-full p-3 border-black border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
+                className="w-full p-3 border rounded-xl border-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400"
                 required
               />
             </div>
@@ -148,14 +148,12 @@ function AddDonationListing() {
 
           {/* Category */}
           <div>
-            <label className="block mb-2 font-medium text-gray-700">
-              Category
-            </label>
+            <label className="block mb-2 text-gray-700 font-semibold">Category</label>
             <select
               name="category"
               value={donationData.category}
               onChange={handleChange}
-              className="w-full p-3 border-black border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-full p-3 border rounded-xl border-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             >
               <option value="">Select a category</option>
@@ -170,15 +168,13 @@ function AddDonationListing() {
 
           {/* Image Upload */}
           <div>
-            <label className="block mb-2 font-medium text-gray-700">
-              Image
-            </label>
+            <label className="block mb-2 text-gray-700 font-semibold">Image</label>
             <input
               type="file"
               accept="image/*"
               ref={fileInputRef}
               onChange={handleFileChange}
-              className="w-full p-3 border-black border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-full p-3 border rounded-xl border-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
           </div>
@@ -187,7 +183,7 @@ function AddDonationListing() {
           <div>
             <button
               type="submit"
-              className="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-yellow-500"
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition"
             >
               + Add Donation
             </button>

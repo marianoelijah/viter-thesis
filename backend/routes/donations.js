@@ -50,13 +50,44 @@ router.post('/', upload.single('image'), async (req, res) => {
 // GET all donations
 router.get('/', async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT * FROM donations');
-    res.json(rows);
+    const [results] = await db.query('SELECT * FROM donations WHERE type = "donation"');
+    res.json(results);
   } catch (err) {
-    console.error('Fetch donations error:', err);
-    res.status(500).json({ error: 'Database fetch error' });
+    console.error('Error fetching donations:', err);
+    res.status(500).json({ error: 'Failed to fetch donations' });
   }
 });
+
+// router.get('/donations', async (req, res) => {
+//   const [rows] = await connection.query('SELECT * FROM donations');
+//   res.json(rows);
+// });
+
+
+router.put('/donations/:id/status', async (req, res) => {
+  const { status } = req.body;
+  const { id } = req.params;
+
+  const allowedStatuses = ['Pending', 'Approved', 'Claimed', 'Completed', 'Rejected'];
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Invalid status value' });
+  }
+
+  await connection.query('UPDATE donations SET status = ? WHERE donationId = ?', [status, id]);
+  res.json({ message: 'Status updated successfully' });
+});
+
+// PUT endpoint to grant donation
+router.put('/:requestId', (req, res) => {
+  const requestId = req.params.requestId;
+
+  const sql = "UPDATE donation_requests SET status = 'Granted' WHERE id = ?";
+  db.query(sql, [requestId], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: 'Donation request granted successfully' });
+  });
+});
+
 
 
 

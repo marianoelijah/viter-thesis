@@ -25,8 +25,8 @@ const Header1 = () => {
           <NavLink to="/home" className="hover:text-white">Home</NavLink>
           <NavLink to="/home/about" className="hover:text-white">About</NavLink>
           <NavLink to="/buyerpage" className="hover:text-white">Buy</NavLink>
-          <NavLink to="/home/trade" className="hover:text-white">Trade</NavLink>
-          <NavLink to="/home/donate" className="hover:text-white">Donate</NavLink>
+          <NavLink to="/trade" className="hover:text-white">Trade</NavLink>
+          <NavLink to="/donate" className="hover:text-white">Donate</NavLink>
         </nav>
 
               {/* User Profile & Cart Icon */}
@@ -71,8 +71,8 @@ const Header1 = () => {
             <NavLink to="/home" onClick={closeMenu} className="hover:text-white">Home</NavLink>
             <NavLink to="/home/about" onClick={closeMenu} className="hover:text-white">About</NavLink>
             <NavLink to="/buyerpage" onClick={closeMenu} className="hover:text-white">Buy</NavLink>
-            <NavLink to="/home/trade" onClick={closeMenu} className="hover:text-white">Trade</NavLink>
-            <NavLink to="/home/donate" onClick={closeMenu} className="hover:text-white">Donate</NavLink>
+            <NavLink to="/trade" onClick={closeMenu} className="hover:text-white">Trade</NavLink>
+            <NavLink to="/donate" onClick={closeMenu} className="hover:text-white">Donate</NavLink>
             
             <Link to="/cart" onClick={closeMenu} className="flex items-center gap-2 text-white">
               <ShoppingCart className="w-5 h-5" />

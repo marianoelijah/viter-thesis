@@ -30,7 +30,7 @@ const BuyerPage = () => {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
 
-  const itemsPerPage = 9;
+  const itemsPerPage = 10;
 
   // Fetch products
   const fetchProducts = async () => {
@@ -45,6 +45,25 @@ const BuyerPage = () => {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  const shopNames = [
+  "GreenHarvest Market",
+  "Fresh Fields Co.",
+  "Happy Sprouts",
+  "Organic Roots",
+  "Farm2Table Express",
+  "Veggie Delight Hub",
+  "Bayanihan Produce",
+  "Sunny Crops Corner",
+  "Nature’s Basket",
+  "AgriSupply Co."
+];
+
+const getRandomShopName = () => {
+  const index = Math.floor(Math.random() * shopNames.length);
+  return shopNames[index];
+};
+
 
   // Filter logic
   const currentDate = new Date();
@@ -262,12 +281,7 @@ const BuyerPage = () => {
               <p className="text-green-600 font-bold mt-2">₱{product.price}</p>
               <p className="text-gray-600 text-sm mt-2">{product.description}</p>
               <span className="text-green-600">In stock: {product.availableStock}</span>
-              <p className="text-sm">
-                <span className="font-semibold">Expiry:</span> {new Date(product.expiryDate).toLocaleDateString()}
-              </p>
-              <p>
-                <span className="font-semibold">Shop:</span> {product.shop}
-              </p>
+              <p className="text-sm text-gray-500 mb-2 italic">Sold by: {getRandomShopName()}</p>
             </div>
           ))
         ) : (

@@ -47,7 +47,7 @@ const Donate = () => {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
 
-  const itemsPerPage = 9;
+  const itemsPerPage = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
 
 const closeModal = () => {
@@ -84,16 +84,20 @@ const handleDonate = async (product) => {
       quantity: 1,
     };
 
-    console.log("Sending donation data:", donationData);
-
     await axios.post("http://localhost:3000/api/donation-request", donationData, {
       headers: {
         "Content-Type": "application/json",
       },
     });
 
-    alert("Donation request sent!");
-    closeModal();
+    // Save product to localStorage and navigate to transaction summary
+    localStorage.setItem("donatedProduct", JSON.stringify(product));
+    navigate("/donatetransaction", {
+      state: {
+        orderSummary: [{ ...product, total: product.price || 0 }],
+      },
+    });
+
   } catch (err) {
     console.error("Error requesting donation:", err);
     alert("Error requesting donation.");

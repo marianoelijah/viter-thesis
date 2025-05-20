@@ -36,7 +36,7 @@ const Trade = () => {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
 
-  const itemsPerPage = 9;
+  const itemsPerPage = 10;
 
   // Fetch products
   const fetchProducts = async () => {

@@ -10,7 +10,7 @@ import About from "./components/pages/frontend/home/About";
 import { AuthProvider } from "./context/AuthContext";
 import Cart from "./components/pages/frontend/home/Cart";
 import Cashout from "./components/pages/frontend/home/Cashout";
-import Confirmation from "./components/pages/frontend/home/Confirmation";
+// import Confirmation from "./components/pages/frontend/home/Confirmation";
 import Trade from './components/pages/frontend/Trades/Trade'; // ✅ Correct for default export
 import Donate from "./components/pages/frontend/Donation/Donate";
 import Login from "./components/pages/frontend/authentication/Login";
@@ -28,8 +28,6 @@ import SellerLayout from "./components/layout.jsx/SellerLayout";
 import EditProduct from "./components/pages/frontend/sellerInterface/EditProduct";
 import ProductDashboard from "./components/pages/frontend/sellerInterface/ProductDashboard";
 import TradeOffers from "./components/pages/frontend/sellerInterface/TradeOffers";
-import Cashout2 from "./components/pages/frontend/Trades/Cashout2"
-import TradeCart from "./components/pages/frontend/Trades/TradeCart";
 import UploadDonationForm from "./components/pages/frontend/Trades/UploadDonationForm";
 import { Toaster } from 'react-hot-toast';
 import CashoutTrade from "./components/pages/frontend/Trades/CashoutTrade";
@@ -37,6 +35,10 @@ import OrderDetails from "./components/pages/frontend/buyerInterface/OrderDetail
 import { CartProvider } from "./components/context/CartContext";
 import ViewDonation from "./components/pages/frontend/Donation/ViewDonation";
 import AddDonationListing from "./components/pages/frontend/Donation/AddDonationListing";
+import Donation from "./components/pages/frontend/Donation/Donation";
+import DonateTransaction from "./components/pages/frontend/Donation/DonateTransaction";
+import TradeCart from "./components/pages/frontend/Trades/TradeCart";
+import Confirmation from "./components/pages/frontend/Donation/Confirmation";
 
 const App = () => {
   const [cart, setCart] = useState([]);
@@ -54,8 +56,8 @@ const App = () => {
               <Route path="/home" element={<Homepage />} />
               <Route path="/home/about" element={<About />} />
               <Route path="/home/products" element={<Productss />} />
-              <Route path="/home/trade" element={<Trade />} />
-              <Route path="/home/donate" element={<Donate />} />
+              <Route path="/trade" element={<Trade />} />
+              <Route path="/donate" element={<Donate />} />
               <Route path="/inventory" element={<Inventory cart={cart} setCart={setCart} />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/cashout" element={<Cashout />} />
@@ -68,12 +70,17 @@ const App = () => {
               {/* buyer-interface */}
               <Route path="/buyerpage" element={<BuyerPage />} />
               <Route path="/userinterface" element={<UserInterface />} />
-              <Route path="/cashout2" element={<Cashout2 />} />
               <Route path="/tradecart" element={<TradeCart />} />
               <Route path="/donationform" element={<UploadDonationForm />} />
               <Route path="/cashout-trade" element={<CashoutTrade />} />
               <Route path="/viewdonations" element={<ViewDonation />} />
               <Route path="/donate/add" element={<AddDonationListing />} />
+              <Route path="/donation-transaction" element={<Donation />} />
+              <Route path="/donatetransaction" element={<DonateTransaction />} />
+              <Route path="/confirmation" element={<Confirmation />} />
+
+
+
 
 
               <Route path="/order/:id" element={<OrderDetails />} />
