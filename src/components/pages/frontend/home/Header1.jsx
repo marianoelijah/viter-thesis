@@ -35,7 +35,7 @@ const Header1 = () => {
                   <Link to="/seller/profile">
                     <User className="w-6 h-6 text-white" />
                   </Link>
-                  <Link to="/home/donate">
+                  <Link to="/donate">
                    <button className="bg-white text-green-700 hover:bg-yellow-300 font-bold px-4 py-2 rounded">
                       Donate Now
                    </button>

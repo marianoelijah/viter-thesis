@@ -18,7 +18,7 @@ const DonateTransaction = () => {
   useEffect(() => {
     const donatedProduct = JSON.parse(localStorage.getItem("donatedProduct"));
     if (!donatedProduct) {
-      navigate("/donate");
+      navigate("/donatetransaction");
     } else {
       setProduct(donatedProduct);
     }

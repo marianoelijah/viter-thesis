@@ -58,7 +58,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get Order Details by ID
+
+// Get Order Details in Transactions (camelCase version for frontend)
 // router.get('/:id', async (req, res) => {
 //   const orderId = req.params.id;
 
@@ -71,42 +72,43 @@ router.post('/', async (req, res) => {
 //     const order = orderResults[0];
 
 //     const [itemsResults] = await db.query(
-//       `SELECT oi.*, p.name AS product_name, p.image AS product_image
-//        FROM order_items oi
-//        LEFT JOIN products p ON oi.product_id = p.id
-//        WHERE oi.order_id = ?`,
+//       `SELECT 
+//   oi.id AS order_item_id, 
+//   oi.product_id, 
+//   oi.quantity, 
+//   oi.price, 
+//   p.name AS product_name, 
+//   p.image AS product_image
+// FROM order_items oi
+// LEFT JOIN products p ON oi.product_id = p.id
+// WHERE oi.order_id = ?`,
 //       [orderId]
 //     );
 
-//     res.json({ ...order, items: itemsResults });
-//   } catch (err) {
-//     console.error('❌ Failed to fetch order details:', err);
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// });
-
-// Get Order Details in Transactions
-// ✅ This is the one to keep and use in frontend
-// router.get('/:id', async (req, res) => {
-//   const orderId = req.params.id;
-
-//   try {
-//     const [orderResults] = await db.query('SELECT * FROM orders2 WHERE id = ?', [orderId]);
-//     if (orderResults.length === 0) {
-//       return res.status(404).json({ error: 'Order not found' });
-//     }
-
-//     const order = orderResults[0];
-
-//     const [itemsResults] = await db.query(
-//       `SELECT oi.*, p.name AS product_name, p.image AS product_image
-//        FROM order_items oi
-//        LEFT JOIN products p ON oi.product_id = p.id
-//        WHERE oi.order_id = ?`,
-//       [orderId]
-//     );
-
-//     res.json({ ...order, items: itemsResults });
+//     res.json({
+//       id: order.id,
+//       userId: order.user_id,
+//       fullName: order.full_name,
+//       email: order.email,
+//       phone: order.phone,
+//       address: order.address,
+//       city: order.city,
+//       postalCode: order.postal_code,
+//       notes: order.notes,
+//       paymentMethod: order.payment_method,
+//       subtotal: order.subtotal,
+//       tax: order.tax,
+//       total: order.total,
+//       createdAt: order.created_at,
+//       items: itemsResults.map(item => ({
+//         id: item.id,
+//         productId: item.product_id,
+//         quantity: item.quantity,
+//         price: item.price,
+//         productName: item.product_name,
+//         productImage: item.product_image
+//       }))
+//     });
 //   } catch (err) {
 //     console.error('❌ Failed to fetch order details:', err);
 //     res.status(500).json({ error: 'Internal server error' });
@@ -118,21 +120,31 @@ router.get('/:id', async (req, res) => {
   const orderId = req.params.id;
 
   try {
+    // Fetch order information
     const [orderResults] = await db.query('SELECT * FROM orders2 WHERE id = ?', [orderId]);
+
     if (orderResults.length === 0) {
       return res.status(404).json({ error: 'Order not found' });
     }
 
     const order = orderResults[0];
 
+    // Fetch associated items, alias oi.id to order_item_id
     const [itemsResults] = await db.query(
-      `SELECT oi.*, p.name AS product_name, p.image AS product_image
+      `SELECT 
+         oi.id AS order_item_id,
+         oi.product_id,
+         oi.quantity,
+         oi.price,
+         p.name AS product_name,
+         p.image AS product_image
        FROM order_items oi
        LEFT JOIN products p ON oi.product_id = p.id
        WHERE oi.order_id = ?`,
       [orderId]
     );
 
+    // Send formatted response
     res.json({
       id: order.id,
       userId: order.user_id,
@@ -149,7 +161,7 @@ router.get('/:id', async (req, res) => {
       total: order.total,
       createdAt: order.created_at,
       items: itemsResults.map(item => ({
-        id: item.id,
+        id: item.order_item_id,         // 👈 FIXED
         productId: item.product_id,
         quantity: item.quantity,
         price: item.price,
@@ -162,6 +174,7 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 // Get Available Products

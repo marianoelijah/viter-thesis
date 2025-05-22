@@ -43,67 +43,138 @@ const Donate = () => {
   const [quantities, setQuantities] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
-
   const itemsPerPage = 10;
+  const [donations, setDonations] = useState([]);
+  const [selectedDonation, setSelectedDonation] = useState(null);
+  const [modalType, setModalType] = useState(""); // "request" or "contact"
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
+  const [requests, setRequests] = useState([]);
+  const [formData, setFormData] = useState({
+  name: "",
+  email: "",
+  message: "",
+});
 
-const closeModal = () => {
-  setIsModalOpen(false);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/api/donations")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Fetched donations:", data);
+        setDonations(data);
+      })
+      .catch((err) => {
+        console.error("Fetch donations failed:", err);
+      });
+  }, []);
+
+  useEffect(() => {
+  fetch("http://localhost:3000/api/requests")
+    .then((res) => res.json())
+    .then((data) => {
+      const approved = data.filter((r) => r.status === "Approved");
+      setRequests(approved);
+    });
+}, []);
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!selectedDonation) return;
+
+  const requestPayload = {
+    ...formData,
+    status: "Approved", 
+    donationId: selectedDonation.donationId,
+    productName: selectedDonation.productName,
+    quantity: selectedDonation.quantity,
+  };
+
+  try {
+    const response = await fetch("http://localhost:3000/api/requests", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestPayload),
+    });
+
+    if (response.ok) {
+      alert("Your request has been submitted and approved!");
+      closeModal();
+      setFormData({ name: "", email: "", message: "" });
+      navigate("/donatetransaction");
+    } else {
+      alert("Failed to submit request.");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Something went wrong.");
+  }
 };
+
+
+  const openModal = (donation, type) => {
+    setSelectedDonation(donation);
+    setModalType(type);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedDonation(null);
+    setModalType("");
+  };
 
 
   // Fetch products
-  const fetchProducts = async () => {
-    try {
-      const res = await axios.get("http://localhost:3000/api/products");
-       const productsWithShops = res.data.map(product => ({
-      ...product,
-      shopName: getRandomShop()
-    }));
-    setProducts(productsWithShops);
-  } catch (err) {
-    console.error("Failed to fetch products", err);
-  }
-  };
+//   const fetchProducts = async () => {
+//     try {
+//       const res = await axios.get("http://localhost:3000/api/products");
+//        const productsWithShops = res.data.map(product => ({
+//       ...product,
+//       shopName: getRandomShop()
+//     }));
+//     setProducts(productsWithShops);
+//   } catch (err) {
+//     console.error("Failed to fetch products", err);
+//   }
+//   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+//   useEffect(() => {
+//     fetchProducts();
+//   }, []);
 
+// const handleDonate = async (product) => {
+//   try {
+//     const buyerId = 1; // Replace with actual logged-in ID
 
-const handleDonate = async (product) => {
-  try {
-    const buyerId = 1; // Replace with actual logged-in ID
+//     const donationData = {
+//       product_id: product.id,
+//       buyer_id: buyerId,
+//       quantity: 1,
+//     };
 
-    const donationData = {
-      product_id: product.id,
-      buyer_id: buyerId,
-      quantity: 1,
-    };
+//     await axios.post("http://localhost:3000/api/requests", donationData, {
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     });
 
-    await axios.post("http://localhost:3000/api/donation-request", donationData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+//     // Save product to localStorage and navigate to transaction summary
+//     localStorage.setItem("donatedProduct", JSON.stringify(product));
+//     navigate("/donatetransaction", {
+//       state: {
+//         orderSummary: [{ ...product, total: product.price || 0 }],
+//       },
+//     });
 
-    // Save product to localStorage and navigate to transaction summary
-    localStorage.setItem("donatedProduct", JSON.stringify(product));
-    navigate("/donatetransaction", {
-      state: {
-        orderSummary: [{ ...product, total: product.price || 0 }],
-      },
-    });
-
-  } catch (err) {
-    console.error("Error requesting donation:", err);
-    alert("Error requesting donation.");
-  }
-};
-
+//   } catch (err) {
+//     console.error("Error requesting donation:", err);
+//     alert("Error requesting donation.");
+//   }
+// };
 
 
   // Filter logic
@@ -203,6 +274,12 @@ const handleDonate = async (product) => {
         <Link to="/cart" className="relative">
           <ShoppingCart className="w-7 h-7 text-black hover:text-green-600" />
         </Link>
+         <button
+           onClick={() => navigate("/donatetransaction")}
+           className="ml-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition"
+          >
+           View Transactions
+          </button>
       </div>
       
 
@@ -261,28 +338,58 @@ const handleDonate = async (product) => {
   </div>
 
       {/* Product Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {paginatedProducts.length > 0 ? (
-          paginatedProducts.map((product) => (
-            <div
-              key={product.id}
-              onClick={() => setModalProduct(product)}
-              className="border rounded-lg p-4 shadow-md hover:shadow-lg transition bg-white"
-            >
-              <img
-                src={`http://localhost:3000/uploads/${product.image}`}
-                alt={product.name}
-                className="w-full h-40 object-cover rounded-md mb-4"
-              />
-              <h2 className="text-xl font-semibold">{product.name}</h2>
-              <p className="text-gray-500">{product.category}</p>
-              <span className="text-green-600">In stock: {product.availableStock}</span>
-              <p className="text-sm text-gray-500">Shop: {product.shopName}</p>
-              
-            </div>
-          ))
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-4xl font-bold text-center text-green-700 mb-8">
+          Available Donations
+        </h2>
+        {donations.length === 0 ? (
+          <p className="text-center text-gray-600">No donations available.</p>
         ) : (
-          <p>No products found.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {donations.map((donation) => (
+              <div
+                key={donation.donationId}
+                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 transform hover:scale-105 p-5"
+              >
+                {donation.image ? (
+                  <img
+                    src={`http://localhost:3000/uploads/${donation.image}`}
+                    alt={donation.productName}
+                    className="w-full h-48 object-cover rounded-xl mb-4"
+                  />
+                ) : (
+                  <div className="w-full h-48 bg-gray-300 text-gray-600 flex items-center justify-center rounded-xl mb-4">
+                    No Image
+                  </div>
+                )}
+                <h3 className="text-lg font-semibold text-green-800 mb-1">
+                  {donation.productName}
+                </h3>
+                <p className="text-sm text-gray-700 mb-1">{donation.description}</p>
+                <p className="text-sm font-medium text-gray-600">Status: {donation.status}</p>
+                <p className="text-sm text-gray-600 mb-1">
+                  Quantity: {donation.quantity} | Stock: {donation.availableStock}
+                </p>
+                <p className="text-sm text-gray-600 mb-3">
+                  Category: <span className="font-medium">{donation.category}</span>
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => openModal(donation, "request")}
+                    className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition"
+                  >
+                    Request
+                  </button>
+                  <button
+                    onClick={() => openModal(donation, "contact")}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition"
+                  >
+                    Contact
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
@@ -311,54 +418,86 @@ const handleDonate = async (product) => {
       )}
 
       {/* Modal */}
-      {modalProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg max-w-4xl w-full p-6 relative flex gap-6">
-            <button onClick={() => setModalProduct(null)} className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-xl font-bold">×</button>
+      {isModalOpen && selectedDonation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl relative">
+            <button
+              onClick={closeModal}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+            >
+              &times;
+            </button>
 
-            <div className="w-1/2">
-              <img src={`http://localhost:3000/uploads/${modalProduct.image}`} alt={modalProduct.name} className="w-full h-full object-cover rounded-lg" />
-            </div>
-
-            <div className="w-1/2 flex flex-col">
-              <div>
-                <h2 className="text-3xl font-bold mb-2">{modalProduct.name}</h2>
-                <p className="text-gray-700 mb-3">{modalProduct.description}</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500">Stock: {modalProduct.availableStock}</span>
-                  <span className="text-sm text-gray-500">Shop: {modalProduct.shop}</span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => {
-                  addToCart(modalProduct);
-                  toast.success(`${modalProduct.name} added to cart!`);
-                }}
-                disabled={modalProduct.availableStock <= 0}
-                className={` py-2 rounded text-white w-full ${modalProduct.availableStock <= 0 ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 hover:bg-green-600"}`}
-              >
-                {modalProduct.availableStock <= 0 ? "Out of Stock" : "Add to Cart"}
-              </button>
-              <h3 className="text-xl font-bold">Recommended Products:</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  {getRecommendedProducts().map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => setModalProduct(item)}
-                      className="border p-4 rounded-lg text-center transform transition hover:scale-105 hover:shadow-md"
-                    >
-                      <h6 className="font-bold text-sm">{item.name}</h6>
-                      <button
-                  onClick={() => handleDonate(modalProduct)}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm rounded-lg font-semibold"
-                >
+            {modalType === "request" ? (
+              <>
+                <h3 className="text-xl font-semibold text-green-700 mb-4">
                   Request Donation
-                </button>
-                    </div>
-                  ))}
+                </h3>
+                <p className="text-sm mb-2">
+                  You are requesting <strong>{selectedDonation.productName}</strong>
+                </p>
+                <form className="flex flex-col gap-3">
+                 <input
+  type="text"
+  placeholder="Your name"
+  className="border border-gray-300 rounded px-3 py-2"
+  value={formData.name}
+  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+/>
+<input
+  type="email"
+  placeholder="Your email"
+  className="border border-gray-300 rounded px-3 py-2"
+  value={formData.email}
+  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+/>
+<textarea
+  placeholder="Message or reason for request"
+  className="border border-gray-300 rounded px-3 py-2"
+  rows={3}
+  value={formData.message}
+  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+/>
+
+ <button
+  type="submit"
+  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+  onClick={handleSubmit}
+>
+  Submit Request
+</button>
+
+
+                </form>
+              </>
+            ) : (
+              <>
+                <h3 className="text-xl font-semibold text-blue-700 mb-4">
+                  Contact Donor
+                </h3>
+                <p className="text-sm mb-2">
+                  Contact details for <strong>{selectedDonation.productName}</strong>
+                </p>
+                <div className="text-sm text-gray-700 space-y-1">
+                  {/* Replace these with real data when available */}
+                  <p>
+                    <strong>Donor Name:</strong> Juan Dela Cruz
+                  </p>
+                  <p>
+                    <strong>Email:</strong> juan.donor@example.com
+                  </p>
+                  <p>
+                    <strong>Phone:</strong> 0917-123-4567
+                  </p>
                 </div>
-            </div>
+                <button
+                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                  onClick={closeModal}
+                >
+                  Close
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

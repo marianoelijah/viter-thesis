@@ -37,30 +37,6 @@ const ViewDonations = () => {
     });
 }, []);
 
-
-//   const handleSubmit = async (e) => {
-//   e.preventDefault();
-//   try {
-//     const response = await fetch("http://localhost:3000/api/requests", {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify(formData),
-//     });
-
-//     if (response.ok) {
-//       alert("Request submitted successfully!");
-//       closeModal();
-//       setFormData({ name: "", email: "", message: "" });
-//       navigate("/donation-management");
-//     } else {
-//       alert("Failed to submit request.");
-//     }
-//   } catch (error) {
-//     console.error("Error:", error);
-//     alert("Something went wrong.");
-//   }
-// };
-
 const handleSubmit = async (e) => {
   e.preventDefault();
 
@@ -68,7 +44,7 @@ const handleSubmit = async (e) => {
 
   const requestPayload = {
     ...formData,
-    status: "Approved", // Automatically approve the request
+    status: "Approved", 
     donationId: selectedDonation.donationId,
     productName: selectedDonation.productName,
     quantity: selectedDonation.quantity,
@@ -82,10 +58,10 @@ const handleSubmit = async (e) => {
     });
 
     if (response.ok) {
-      alert("Request submitted and automatically approved!");
+      alert("Your request has been submitted and approved!");
       closeModal();
       setFormData({ name: "", email: "", message: "" });
-      navigate("/donation-management");
+      navigate("/donatetransaction");
     } else {
       alert("Failed to submit request.");
     }
@@ -115,6 +91,12 @@ const handleSubmit = async (e) => {
             className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg transition"
           >
             ← Back
+          </button>
+          <button
+           onClick={() => navigate("/donatetransaction")}
+           className="ml-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition"
+          >
+           View Transactions
           </button>
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl font-bold text-center text-green-700 mb-8">
