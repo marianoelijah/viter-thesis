@@ -178,26 +178,34 @@ const handleSubmit = async (e) => {
 
 
   // Filter logic
-  const currentDate = new Date();
-  const filteredProducts = products.filter(product => {
-    const expiry = new Date(product.expiryDate);
-    if (expiry < currentDate) return false;
-    if (category !== "All" && product.category !== category) return false;
-    const lowerQuery = query.toLowerCase();
-    if (
-      query &&
-      !product.name.toLowerCase().includes(lowerQuery) &&
-      !product.description.toLowerCase().includes(lowerQuery) &&
-      !product.category.toLowerCase().includes(lowerQuery) &&
-      !product.seller.toLowerCase().includes(lowerQuery)
-    ) {
-      const matchedCategory = keywordToCategory[lowerQuery];
-      if (!matchedCategory || matchedCategory !== product.category) return false;
-    }
-    if (!product.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
-    if (product.availableStock <= 0) return false;
-    return true;
-  });
+const currentDate = new Date();
+const filteredProducts = products.filter(product => {
+  const expiry = new Date(product.expiryDate);
+  if (expiry < currentDate) return false;
+
+  if (category !== "All" && product.category !== category) return false;
+
+  const lowerQuery = query.toLowerCase();
+  if (
+    query &&
+    !product.name?.toLowerCase().includes(lowerQuery) &&
+    !product.description?.toLowerCase().includes(lowerQuery) &&
+    !product.category?.toLowerCase().includes(lowerQuery) &&
+    !product.seller?.toLowerCase().includes(lowerQuery)
+  ) {
+    const matchedCategory = keywordToCategory[lowerQuery];
+    if (!matchedCategory || matchedCategory !== product.category) return false;
+  }
+
+  if (minPrice && product.price < parseFloat(minPrice)) return false;
+  if (maxPrice && product.price > parseFloat(maxPrice)) return false;
+
+  if (!product.name?.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+  if (product.availableStock <= 0) return false;
+
+  return true;
+});
+
 
   const uniqueCategories = ["All", ...new Set(products.map(p => p.category))];
 

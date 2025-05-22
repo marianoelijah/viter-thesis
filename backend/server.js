@@ -15,6 +15,7 @@ import tradeRouter from './routes/tradeRoutes.js';
 import sellerProfileRoutes from './routes/sellerProfileRoutes.js';
 import tradeCartRoutes from './routes/tradeCart.js';
 import requestRoutes from "./routes/requests.js";
+import inventoryRouter from './routes/inventory.js';
 
 
 // Mysql Database
@@ -77,6 +78,7 @@ app.use(productRoutes); // For product handling
 app.use(sellerProfileRoutes);
 app.use('/api/tradecart', tradeCartRoutes);
 app.use("/api/requests", requestRoutes); 
+app.use('/api/inventory', inventoryRouter);
 
 app.use((req, res) => {
   res.status(404).send(`❌ Route not found: ${req.originalUrl}`);

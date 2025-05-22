@@ -3,7 +3,6 @@ import { StoreProvider } from "./components/store/storeContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Welcome from "./components/pages/frontend/partials2/Welcome";
 import Homepage from "./components/pages/frontend/home/Homepage";
-import Inventory from "./components/pages/frontend/home/Inventory";
 import { useState } from "react";
 import Productss from "./components/pages/frontend/home/Productss";
 import About from "./components/pages/frontend/home/About";
@@ -39,6 +38,7 @@ import Donation from "./components/pages/frontend/Donation/Donation";
 import DonateTransaction from "./components/pages/frontend/Donation/DonateTransaction";
 import TradeCart from "./components/pages/frontend/Trades/TradeCart";
 import Confirmation from "./components/pages/frontend/Donation/Confirmation";
+import Inventory from "./components/pages/frontend/sellerInterface/Inventory";
 
 const App = () => {
   const [cart, setCart] = useState([]);
@@ -58,7 +58,6 @@ const App = () => {
               <Route path="/home/products" element={<Productss />} />
               <Route path="/trade" element={<Trade />} />
               <Route path="/donate" element={<Donate />} />
-              <Route path="/inventory" element={<Inventory cart={cart} setCart={setCart} />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/cashout" element={<Cashout />} />
               <Route path="/confirmation" element={<Confirmation />} />
@@ -78,11 +77,6 @@ const App = () => {
               <Route path="/donation-transaction" element={<Donation />} />
               <Route path="/donatetransaction" element={<DonateTransaction />} />
               <Route path="/confirmation" element={<Confirmation />} />
-
-
-
-
-
               <Route path="/order/:id" element={<OrderDetails />} />
 
               {/* seller-interface */}
@@ -99,6 +93,7 @@ const App = () => {
               <Route path="/seller/profile" element={<SellerProfile />} />
               <Route path="/product-dashboard" element={<ProductDashboard />} />
               <Route path="/trade-product" element={<TradeOffers />} />
+              <Route path="/seller/inventory" element={<Inventory cart={cart} setCart={setCart} />} />
             </Routes>
           </CartProvider>
         </StoreProvider>

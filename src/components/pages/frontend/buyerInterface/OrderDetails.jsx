@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const OrderDetails = () => {
   const { id } = useParams();
@@ -31,8 +32,14 @@ const OrderDetails = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-100 via-white to-green-200 py-12 px-4">
          <button onClick={() => navigate(-1)} className="flex items-center text-gray-700 hover:text-green-600">
-                  <ArrowLeft className="mr-2" /> Back
-                </button>
+            <ArrowLeft className="mr-2" /> Back
+          </button>
+          <Link
+            to="/userinterface"
+            className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg text-lg hover:bg-gray-300 transition"
+            >
+            Back to Home
+          </Link>
       <div className="max-w-4xl mx-auto bg-gray-300 rounded-2xl shadow-lg p-8">
         <h1 className="text-3xl font-extrabold text-green-800 mb-6 border-b pb-2">Order Details</h1>
 
