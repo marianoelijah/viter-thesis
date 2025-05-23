@@ -3,6 +3,8 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import mysql from 'mysql2/promise';
+import multer from 'multer';
+import fs from 'fs';
 
 
 // Route imports
@@ -11,11 +13,13 @@ import authRoutes from './routes/authRoutes.js';
 import donationsRoutes from './routes/donations.js';
 import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
-import tradeRouter from './routes/tradeRoutes.js';
-import sellerProfileRoutes from './routes/sellerProfileRoutes.js';
+// import tradeRouter from './routes/tradeRoutes.js';
 import tradeCartRoutes from './routes/tradeCart.js';
 import requestRoutes from "./routes/requests.js";
 import inventoryRouter from './routes/inventory.js';
+import sellerProfileRoutes from "./routes/sellerProfile.js";
+import tradeRoutes from './routes/trade.js';
+
 
 
 // Mysql Database
@@ -59,6 +63,20 @@ const PORT = process.env.PORT || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Multer setup for image uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + '-' + file.originalname);
+  },
+});
+const upload = multer({ storage });
+
+
+
 // Middleware
 app.use(cors());  // Enable CORS
 app.use(express.json());  // Parse incoming JSON requests
@@ -71,14 +89,16 @@ app.get('/', (req, res) => res.send('CORS is enabled!'));
 // Mount routers
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
-app.use('/api/trade', tradeRouter);
+// app.use('/api/trade', tradeRouter);
 app.use('/api/donations', donationsRoutes);
 app.use('/api/orders2', orderRoutes);  // For checkout/order handling
 app.use(productRoutes); // For product handling
-app.use(sellerProfileRoutes);
 app.use('/api/tradecart', tradeCartRoutes);
 app.use("/api/requests", requestRoutes); 
 app.use('/api/inventory', inventoryRouter);
+app.use("/api/seller-profile", sellerProfileRoutes);
+app.use('/api/trades', tradeRoutes);
+
 
 app.use((req, res) => {
   res.status(404).send(`❌ Route not found: ${req.originalUrl}`);

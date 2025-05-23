@@ -39,6 +39,10 @@ import DonateTransaction from "./components/pages/frontend/Donation/DonateTransa
 import TradeCart from "./components/pages/frontend/Trades/TradeCart";
 import Confirmation from "./components/pages/frontend/Donation/Confirmation";
 import Inventory from "./components/pages/frontend/sellerInterface/Inventory";
+import TradePage from "./components/pages/frontend/Trades/TradePage";
+import AddTrade from "./components/pages/frontend/Trades/AddTrade";
+import ProductList from "./components/pages/frontend/Trades/ProductList";
+import TradeList from "./components/pages/frontend/Trades/TradeList";
 
 const App = () => {
   const [cart, setCart] = useState([]);
@@ -78,7 +82,11 @@ const App = () => {
               <Route path="/donatetransaction" element={<DonateTransaction />} />
               <Route path="/confirmation" element={<Confirmation />} />
               <Route path="/order/:id" element={<OrderDetails />} />
-
+              <Route path="/tradepage" element={<TradePage />} />
+              <Route path="/addtrade" element={<AddTrade />} />
+              <Route path="/productlist" element={<ProductList />} />
+              <Route path="/tradelist" element={<TradeList />} />
+              
               {/* seller-interface */}
               <Route path="/sellerpage" element={<SellerPage />} />
               <Route path="/admininterface" element={<AdminInterface />} />
