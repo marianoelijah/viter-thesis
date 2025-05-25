@@ -4,6 +4,16 @@ import { ArrowLeft } from "lucide-react";
 
 const AddTrade = () => {
   const navigate = useNavigate();
+  const currentUserId = localStorage.getItem('userId');
+  const [selectedRequesterProductId, setSelectedRequesterProductId] = useState('');
+const [selectedReceiverUserId, setSelectedReceiverUserId] = useState('');
+const [selectedReceiverProductId, setSelectedReceiverProductId] = useState('');
+const [requestImageFile, setRequestImageFile] = useState(null);
+const [offerImageFile, setOfferImageFile] = useState(null);
+const [requesterQuantity, setRequesterQuantity] = useState(1);
+const [receiverQuantity, setReceiverQuantity] = useState(1);
+
+
 
   const [request, setRequest] = useState({
     title: '',
@@ -19,14 +29,22 @@ const AddTrade = () => {
 
 const handleSubmit = async (e) => {
   e.preventDefault();
+  console.log('Submitting trade...'); // DEBUG
 
   const formData = new FormData();
-  formData.append('requestTitle', request.title);
-  formData.append('requestCategory', request.category);
-  formData.append('requestImage', request.image);
-  formData.append('offerTitle', offer.title);
-  formData.append('offerCategory', offer.category);
-  formData.append('offerImage', offer.image);
+  formData.append('requesterUserId', currentUserId); // <- this must NOT be null
+  formData.append('requesterProductId', selectedRequesterProductId);
+  formData.append('receiverUserId', selectedReceiverUserId);
+  formData.append('receiverProductId', selectedReceiverProductId);
+  formData.append('requestImage', requestImageFile);
+  formData.append('offerImage', offerImageFile);
+  formData.append('requesterQuantity', requesterQuantity);
+  formData.append('receiverQuantity', receiverQuantity);
+
+   // Debugging: log what's being sent
+  for (let pair of formData.entries()) {
+    console.log(`${pair[0]}:`, pair[1]);
+  }
 
   try {
     const response = await fetch('http://localhost:3000/api/trades', {
@@ -47,16 +65,17 @@ const handleSubmit = async (e) => {
   }
 };
 
+ const handleImageChange = (e, type) => {
+  const file = e.target.files[0];
+  if (type === 'request') {
+    setRequest({ ...request, image: file });
+    setRequestImageFile(file);  // add this
+  } else {
+    setOffer({ ...offer, image: file });
+    setOfferImageFile(file);  // add this
+  }
+};
 
-
-  const handleImageChange = (e, type) => {
-    const file = e.target.files[0];
-    if (type === 'request') {
-      setRequest({ ...request, image: file });
-    } else {
-      setOffer({ ...offer, image: file });
-    }
-  };
 
   const handleViewProducts = () => {
     navigate('/productlist');
@@ -109,6 +128,14 @@ const handleSubmit = async (e) => {
                 <option value="Vegetables">Vegetables</option>
                 <option value="Grains">Grains</option>
               </select>
+              <input
+                type="number"
+                placeholder="Quantity"
+                min={1}
+                value={requesterQuantity}
+                onChange={(e) => setRequesterQuantity(e.target.value)}
+                className="w-full border border-green-300 p-3 rounded mb-5 placeholder-green-400 focus:outline-none focus:ring-2 focus:ring-green-400"
+              />
               <button
                 type="button"
                 onClick={handleViewProducts}
@@ -151,6 +178,14 @@ const handleSubmit = async (e) => {
                 <option value="Vegetables">Vegetables</option>
                 <option value="Grains">Grains</option>
               </select>
+              <input
+                type="number"
+                placeholder="Quantity"
+                min={1}
+                value={receiverQuantity}
+                onChange={(e) => setReceiverQuantity(e.target.value)}
+                className="w-full border border-green-300 p-3 rounded mb-5 placeholder-green-400 focus:outline-none focus:ring-2 focus:ring-green-400"
+              />
               <button
                 type="button"
                 onClick={handleViewProducts}

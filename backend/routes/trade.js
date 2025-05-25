@@ -7,73 +7,105 @@ import db from '../config/db.js';
 
 const router = express.Router();
 
-// ESM replacement for __dirname
+// // ESM replacement for __dirname
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
+// // Ensure the upload folder exists
+// const uploadDir = path.join(__dirname, '../uploads/trades');
+// if (!fs.existsSync(uploadDir)) {
+//   fs.mkdirSync(uploadDir, { recursive: true });
+// }
+
+// // Multer setup
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, uploadDir);
+//   },
+//   filename: function (req, file, cb) {
+//     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+//     const ext = path.extname(file.originalname);
+//     cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+//   },
+// });
+
+// const upload = multer({ storage });
+
+// For __dirname in ES module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Ensure the upload folder exists
+// Setup upload folder
 const uploadDir = path.join(__dirname, '../uploads/trades');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// const db = mysql.createConnection({
-//   host: 'localhost',
-//   user: 'root',
-//   password: '',
-//   database: 'seedling_db'
-// });
-
-// db.connect((err) => {
-//   if (err) {
-//     console.error('Database connection failed:', err.stack);
-//     return;
-//   }
-//   console.log('Connected to MySQL as ID', db.threadId);
-// });
-
-// Multer setup
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + '-' + file.originalname);
   },
 });
 
 const upload = multer({ storage });
 
+
 // POST /api/trades
+// DEBUG ROUTE — log everything
 router.post('/', upload.fields([
   { name: 'requestImage', maxCount: 1 },
-  { name: 'offerImage', maxCount: 1 },
-]), (req, res) => {
+  { name: 'offerImage', maxCount: 1 }
+]), async (req, res) => {
   try {
-    const { requestTitle, requestCategory, offerTitle, offerCategory } = req.body;
-    const requestImage = req.files['requestImage']?.[0]?.filename || null;
-    const offerImage = req.files['offerImage']?.[0]?.filename || null;
+    console.log('✅ Incoming request');
+    console.log('➡️ BODY:', req.body);
+    console.log('➡️ FILES:', req.files);
 
-    const sql = `
-      INSERT INTO trades (request_title, request_category, request_image, offer_title, offer_category, offer_image)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `;
+    const {
+      requesterUserId,
+      requesterProductId,
+      receiverUserId,
+      receiverProductId,
+      status,
+      requesterQuantity,
+      receiverQuantity,
+    } = req.body;
 
-    db.query(sql, [requestTitle, requestCategory, requestImage, offerTitle, offerCategory, offerImage], (err, result) => {
-      if (err) {
-        console.error('SQL Error:', err);  // ← this is crucial
-        return res.status(500).json({ message: 'Failed to submit trade', error: err.message });
-      }
+    const requestImage = req.files?.['requestImage']?.[0]?.filename || null;
+    const offerImage = req.files?.['offerImage']?.[0]?.filename || null;
 
-      res.status(201).json({ message: 'Trade submitted successfully' });
-    });
-  } catch (err) {
-    console.error('Server Error:', err);  // ← catch block error
-    res.status(500).json({ message: 'Unexpected error submitting trade', error: err.message });
+    console.log('📸 requestImage:', requestImage);
+    console.log('📸 offerImage:', offerImage);
+
+    const [result] = await db.query(
+      `INSERT INTO trade_requests 
+      (requesterUserId, requesterProductId, receiverUserId, receiverProductId, status, requestImage, offerImage, requesterQuantity, receiverQuantity) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        requesterUserId,
+        requesterProductId,
+        receiverUserId,
+        receiverProductId,
+        status,
+        requestImage,
+        offerImage,
+        requesterQuantity,
+        receiverQuantity
+      ]
+    );
+
+    console.log('✅ Trade request inserted successfully.');
+    res.status(200).json({ message: 'Trade request submitted successfully', insertId: result.insertId });
+  } catch (error) {
+    console.error('❌ Error in trade request submission:', error);
+    res.status(500).json({ message: 'Unexpected error submitting trade', error: error.message });
   }
 });
+
 
 
 // GET all trades
