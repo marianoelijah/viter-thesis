@@ -43,6 +43,7 @@ import TradePage from "./components/pages/frontend/Trades/TradePage";
 import AddTrade from "./components/pages/frontend/Trades/AddTrade";
 import ProductList from "./components/pages/frontend/Trades/ProductList";
 import TradeList from "./components/pages/frontend/Trades/TradeList";
+import ProductUpload from "./components/pages/frontend/Trades/ProductUpload";
 
 const App = () => {
   const [cart, setCart] = useState([]);
@@ -86,6 +87,8 @@ const App = () => {
               <Route path="/addtrade" element={<AddTrade />} />
               <Route path="/productlist" element={<ProductList />} />
               <Route path="/tradelist" element={<TradeList />} />
+              <Route path="/product-upload" element={<ProductUpload />} />
+
               
               {/* seller-interface */}
               <Route path="/sellerpage" element={<SellerPage />} />

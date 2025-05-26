@@ -12,7 +12,7 @@ function SellerLayout() {
     { path: "/seller/edit-product/:id", label: "Edit Product" },
     { path: "/seller/my-products", label: "My Products" },
     { path: "/seller/inventory", label: "Inventory" },
-    // { path: "/seller/manage-orders", label: "Manage Trade Orders" },
+    { path: "/seller/manage-orders", label: "Manage Trade Orders" },
     { path: "/seller/donations", label: "Manage Donation" },
     { path: "/seller/profile", label: "Profile" },
     { path: "/login", label: "Logout" },
