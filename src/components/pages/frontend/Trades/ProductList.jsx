@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaExchangeAlt } from 'react-icons/fa'; // Trade icon
@@ -60,6 +60,12 @@ const ProductList = () => {
             </span>
       )}
           </button>
+          <Link
+            to="/product-upload"
+            className="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded hover:bg-transparent hover:text-green-600 transition-all"
+            >
+              Add Trade Product
+          </Link>
           {/* Back button */}
           <button
             onClick={() => navigate('/addtrade')}

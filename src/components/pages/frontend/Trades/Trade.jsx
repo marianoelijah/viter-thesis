@@ -190,14 +190,32 @@ const filteredProducts = products.filter(product => {
   return (
     <div className="min-h-screen bg-green-100 p-6 relative">
       {/* Top Nav */}
-      <div className="flex justify-between items-center mb-6">
-        <button onClick={() => navigate(-1)} className="flex items-center text-gray-700 hover:text-green-600">
-          <ArrowLeft className="mr-2" /> Back
-        </button>
-        <Link to="/cart" className="relative">
-          <ShoppingCart className="w-7 h-7 text-black hover:text-green-600" />
-        </Link>
-      </div>
+<div className="flex justify-between items-center mb-6">
+  {/* Left-side navigation */}
+  <div className="flex items-center gap-4">
+    <button
+      onClick={() => navigate(-1)}
+      className="flex items-center text-gray-700 hover:text-green-600 transition-colors"
+    >
+      <ArrowLeft className="mr-2 h-5 w-5" />
+      <span className="text-sm font-medium">Back</span>
+    </button>
+
+    <Link
+      to="/productlist"
+      className="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded hover:bg-transparent hover:text-green-600 transition-all"
+    >
+      Go to Product List
+    </Link>
+  </div>
+
+  {/* Cart icon */}
+  <Link to="/cart" className="relative group">
+    <ShoppingCart className="w-7 h-7 text-black group-hover:text-green-600 transition-colors" />
+    {/* Optional: Cart badge example */}
+    {/* <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full">3</span> */}
+  </Link>
+</div>
 
       {/* Title */}
       <h1 className="text-4xl font-bold text-center text-green-800 mb-2">Welcome, Buyer!</h1>
