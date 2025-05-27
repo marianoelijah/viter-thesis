@@ -23,6 +23,7 @@ const Login = () => {
       });
 
       const data = await res.json();
+      console.log("Login response:", data);
 
       if (res.ok) {
         login(data); // ✅ use context-aware login

@@ -1,22 +1,31 @@
-// src/context/AuthContext.jsx
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  // login function to set the user data in context
+  // Restore user from localStorage on first render
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  // Save user to localStorage on login
   const login = (userData) => {
-    // Normalize id field so it’s easier to access
-    setUser({
+    const normalizedUser = {
       ...userData,
-      id: userData.userId || userData.id, 
-    });
+      id: userData.userId || userData.id,
+    };
+    setUser(normalizedUser);
+    localStorage.setItem('user', JSON.stringify(normalizedUser)); // ✅ persist
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem('user'); // ✅ clear on logout
   };
 
   return (
@@ -26,7 +35,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook for easier context usage
 export const useAuth = () => useContext(AuthContext);
-
 export default AuthContext;
