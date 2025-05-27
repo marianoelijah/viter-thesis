@@ -58,35 +58,59 @@ router.get('/', async (req, res) => {
   }
 });
 
-// router.get('/donations', async (req, res) => {
-//   const [rows] = await connection.query('SELECT * FROM donations');
-//   res.json(rows);
+// router.put('/:id/status', async (req, res) => {
+//   const { status } = req.body;
+//   const { id } = req.params;
+
+//   const allowedStatuses = ['Pending', 'Approved', 'Claimed', 'Completed', 'Rejected'];
+//   if (!allowedStatuses.includes(status)) {
+//     return res.status(400).json({ error: 'Invalid status value' });
+//   }
+
+//   await connection.query('UPDATE donations SET status = ? WHERE donationId = ?', [status, id]);
+//   res.json({ message: 'Status updated successfully' });
+// });
+
+// // PUT endpoint to grant donation
+// router.put('/:requestId', (req, res) => {
+//   const requestId = req.params.requestId;
+
+//   const sql = "UPDATE donation_requests SET status = 'Granted' WHERE id = ?";
+//   db.query(sql, [requestId], (err, result) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json({ message: 'Donation request granted successfully' });
+//   });
 // });
 
 
-router.put('/donations/:id/status', async (req, res) => {
-  const { status } = req.body;
-  const { id } = req.params;
+// PUT /api/requests/:id/approve
+router.put('/:id/approve', (req, res) => {
+  const requestId = req.params.id;
+  const sql = "UPDATE donation_requests SET status = 'Approved' WHERE id = ?";
 
-  const allowedStatuses = ['Pending', 'Approved', 'Claimed', 'Completed', 'Rejected'];
-  if (!allowedStatuses.includes(status)) {
-    return res.status(400).json({ error: 'Invalid status value' });
-  }
-
-  await connection.query('UPDATE donations SET status = ? WHERE donationId = ?', [status, id]);
-  res.json({ message: 'Status updated successfully' });
-});
-
-// PUT endpoint to grant donation
-router.put('/:requestId', (req, res) => {
-  const requestId = req.params.requestId;
-
-  const sql = "UPDATE donation_requests SET status = 'Granted' WHERE id = ?";
   db.query(sql, [requestId], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: 'Donation request granted successfully' });
+    if (err) {
+      console.error("Error approving request:", err);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    res.status(200).json({ message: "Request approved successfully" });
   });
 });
+
+
+// DELETE /api/requests
+router.delete("/", async (req, res) => {
+  try {
+    await db.query("DELETE FROM donation_requests"); // Adjust table name if different
+    res.status(200).json({ message: "All donation requests deleted" });
+  } catch (err) {
+    console.error("Error deleting requests:", err.message);
+    res.status(500).json({ error: "Failed to delete all donation requests" });
+  }
+});
+
+
 
 
 

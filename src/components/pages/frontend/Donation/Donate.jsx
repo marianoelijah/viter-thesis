@@ -4,6 +4,7 @@ import { CartContext } from "@/components/context/CartContext";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 import toast from "react-hot-toast";
 import axios from 'axios';
+import AuthContext from '@/context/AuthContext';
 
 const keywordToCategory = {
   fruits: "Fruits",
@@ -34,6 +35,8 @@ const getRandomShop = () => {
 
 
 const Donate = () => {
+  const { user } = useContext(AuthContext);
+  const userId = user?.id;
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState("All");
   const [query, setQuery] = useState("");
@@ -71,14 +74,35 @@ const Donate = () => {
       });
   }, []);
 
-  useEffect(() => {
-  fetch("http://localhost:3000/api/requests")
-    .then((res) => res.json())
-    .then((data) => {
-      const approved = data.filter((r) => r.status === "Approved");
-      setRequests(approved);
-    });
-}, []);
+//   useEffect(() => {
+//   fetch("http://localhost:3000/api/requests")
+//     .then((res) => res.json())
+//     .then((data) => {
+//       const approved = data.filter((r) => r.status === "Approved");
+//       setRequests(approved);
+//     });
+// }, []);
+
+    useEffect(() => {
+    if (!userId) return; // wait until userId is ready
+
+    const fetchRequests = async () => {
+      try {
+        const res = await axios.get(`/api/requests/user/${userId}`);
+        setRequests(res.data);
+
+        const approved = res.data.find(req => req.status === "Approved");
+        if (approved) {
+          toast.success("🎉 Your donation request was approved!");
+          navigate(`/donate-transaction/${approved.id}`);
+        }
+      } catch (err) {
+        toast.error("Error fetching requests");
+      }
+    };
+
+    fetchRequests();
+  }, [userId, navigate]);
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -101,7 +125,7 @@ const handleSubmit = async (e) => {
     });
 
     if (response.ok) {
-      alert("Your request has been submitted and approved!");
+      alert("Your request has been submitted!");
       closeModal();
       setFormData({ name: "", email: "", message: "" });
       navigate("/donatetransaction");
@@ -127,54 +151,6 @@ const handleSubmit = async (e) => {
     setModalType("");
   };
 
-
-  // Fetch products
-//   const fetchProducts = async () => {
-//     try {
-//       const res = await axios.get("http://localhost:3000/api/products");
-//        const productsWithShops = res.data.map(product => ({
-//       ...product,
-//       shopName: getRandomShop()
-//     }));
-//     setProducts(productsWithShops);
-//   } catch (err) {
-//     console.error("Failed to fetch products", err);
-//   }
-//   };
-
-//   useEffect(() => {
-//     fetchProducts();
-//   }, []);
-
-// const handleDonate = async (product) => {
-//   try {
-//     const buyerId = 1; // Replace with actual logged-in ID
-
-//     const donationData = {
-//       product_id: product.id,
-//       buyer_id: buyerId,
-//       quantity: 1,
-//     };
-
-//     await axios.post("http://localhost:3000/api/requests", donationData, {
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//     });
-
-//     // Save product to localStorage and navigate to transaction summary
-//     localStorage.setItem("donatedProduct", JSON.stringify(product));
-//     navigate("/donatetransaction", {
-//       state: {
-//         orderSummary: [{ ...product, total: product.price || 0 }],
-//       },
-//     });
-
-//   } catch (err) {
-//     console.error("Error requesting donation:", err);
-//     alert("Error requesting donation.");
-//   }
-// };
 
 
   // Filter logic
@@ -512,5 +488,7 @@ const filteredProducts = products.filter(product => {
     </div>
   );
 };
+
+
 
 export default Donate;

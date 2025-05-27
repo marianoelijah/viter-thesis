@@ -55,14 +55,6 @@ router.put('/:id/status', async (req, res) => {
   }
 });
 
-
-
-// Grant
-// router.put('/:id/grant', async (req, res) => {
-//   await db.query("UPDATE donation_requests SET status = 'Approved' WHERE id = ?", [req.params.id]);
-//   res.json({ message: 'Request granted' });
-// });
-
 // PUT /api/requests/:id/grant
 router.put('/:id/grant', (req, res) => {
   const requestId = req.params.id;
@@ -80,15 +72,40 @@ router.put('/:id/reject', async (req, res) => {
   res.json({ message: 'Request rejected' });
 });
 
-
-router.put("/:id/approve", (req, res) => {
+// Approve donation request
+router.put('/:id/approve', async (req, res) => {
   const requestId = req.params.id;
-  const query = "UPDATE donation_requests SET status = 'Approved' WHERE id = ?";
 
-  db.query(query, [requestId], (err, result) => {
-    if (err) return res.status(500).json({ error: "Database error" });
-    return res.json({ message: "Request approved" });
-  });
+  try {
+    const [result] = await db.query(
+      "UPDATE donation_requests SET status = 'Approved' WHERE id = ?",
+      [requestId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    res.json({ message: "Request approved successfully" });
+  } catch (err) {
+    console.error("Error approving request:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// GET all requests by userId
+router.get('/user/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const [results] = await db.query(
+      'SELECT * FROM donation_requests WHERE user_id = ?',
+      [userId]
+    );
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 

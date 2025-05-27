@@ -4,7 +4,7 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaExchangeAlt } from 'react-icons/fa'; // Trade icon
 import { useTradeCart } from '@/components/context/TradeCartContext';
-
+import { ArrowLeft } from "lucide-react";
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -42,6 +42,13 @@ const ProductList = () => {
 
  return (
     <div className="min-h-screen bg-gradient-to-b from-green-100 to-gray-100 p-6">
+       <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-gray-700 hover:text-green-600 transition-colors"
+          >
+            <ArrowLeft className="mr-2 h-5 w-5" />
+            <span className="text-sm font-medium">Back</span>
+          </button>
       {/* Header */}
       <div className="flex justify-between items-center mb-10 max-w-6xl mx-auto">
         <h1 className="text-4xl font-bold text-green-800">Available Trade Products</h1>
@@ -68,7 +75,7 @@ const ProductList = () => {
           </Link>
           {/* Back button */}
           <button
-            onClick={() => navigate('/addtrade')}
+            onClick={() => navigate('/trade')}
             className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2.5 rounded-lg shadow transition"
           >
             Back to Trade
