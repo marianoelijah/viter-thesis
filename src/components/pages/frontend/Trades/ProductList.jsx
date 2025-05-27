@@ -1,11 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import { FaExchangeAlt } from 'react-icons/fa'; // Trade icon
+import { useTradeCart } from '@/components/context/TradeCartContext';
+
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const navigate = useNavigate();
+  const { tradeCart, addToTradeCart } = useTradeCart();
+
 
   const fetchProducts = async () => {
     try {
@@ -28,18 +34,43 @@ const ProductList = () => {
     setSelectedProduct(null);
   };
 
-  return (
+ const handleAddToTradeCart = (product) => {
+  addToTradeCart(product); // add to context + localStorage
+  toast.success(`${product.name} added to trade cart!`);
+  closeModal();
+};
+
+ return (
     <div className="min-h-screen bg-gradient-to-b from-green-100 to-gray-100 p-6">
+      {/* Header */}
       <div className="flex justify-between items-center mb-10 max-w-6xl mx-auto">
         <h1 className="text-4xl font-bold text-green-800">Available Trade Products</h1>
-        <button
-          onClick={() => navigate('/trade')}
-          className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2.5 rounded-lg shadow transition"
-        >
-          Back to Trade
-        </button>
+        
+        <div className="flex items-center gap-4">
+          {/* Trade Icon */}
+          <button
+            onClick={() => navigate('/tradecart')}
+            className="relative bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow flex items-center space-x-2"
+            >
+           <FaExchangeAlt className="text-lg" />
+           <span>Trade Cart</span>
+          {tradeCart.length > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+            {tradeCart.length}
+            </span>
+      )}
+          </button>
+          {/* Back button */}
+          <button
+            onClick={() => navigate('/addtrade')}
+            className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2.5 rounded-lg shadow transition"
+          >
+            Back to Trade
+          </button>
+        </div>
       </div>
 
+      {/* Product Grid */}
       {products.length === 0 ? (
         <p className="text-center text-gray-500 text-lg">No products available.</p>
       ) : (
@@ -83,65 +114,61 @@ const ProductList = () => {
       )}
 
       {/* Modal */}
-      {/* Modal */}
-{selectedProduct && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-    <div className="bg-white rounded-xl p-6 w-full max-w-lg relative shadow-lg">
-      <button
-        onClick={closeModal}
-        className="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold"
-      >
-        &times;
-      </button>
+      {selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-lg relative shadow-lg">
+            <button
+              onClick={closeModal}
+              className="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold"
+            >
+              &times;
+            </button>
 
-      <h2 className="text-2xl font-bold text-green-800 mb-4">{selectedProduct.name}</h2>
+            <h2 className="text-2xl font-bold text-green-800 mb-4">{selectedProduct.name}</h2>
 
-      {(() => {
-        let imageUrl = '';
-        try {
-          const images = JSON.parse(selectedProduct.images);
-          if (images.length > 0) {
-            imageUrl = `http://localhost:3000/uploads/trades/${images[0]}`;
-          }
-        } catch (e) {
-          console.error("Modal image parse error", e);
-        }
+            {(() => {
+              let imageUrl = '';
+              try {
+                const images = JSON.parse(selectedProduct.images);
+                if (images.length > 0) {
+                  imageUrl = `http://localhost:3000/uploads/trades/${images[0]}`;
+                }
+              } catch (e) {
+                console.error("Modal image parse error", e);
+              }
 
-        return imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={selectedProduct.name}
-            className="w-full h-64 object-cover rounded mb-4"
-          />
-        ) : (
-          <div className="w-full h-64 bg-gray-200 rounded mb-4 flex items-center justify-center text-gray-500">
-            No Image
+              return imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={selectedProduct.name}
+                  className="w-full h-64 object-cover rounded mb-4"
+                />
+              ) : (
+                <div className="w-full h-64 bg-gray-200 rounded mb-4 flex items-center justify-center text-gray-500">
+                  No Image
+                </div>
+              );
+            })()}
+
+            <div className="space-y-2 text-gray-700 mb-6">
+              <p><strong>Category:</strong> {selectedProduct.category}</p>
+              <p><strong>Price:</strong> {selectedProduct.price}</p>
+              <p><strong>Quantity:</strong> {selectedProduct.quantity}</p>
+              <p><strong>Description:</strong> {selectedProduct.description || 'No description available.'}</p>
+              <p><strong>Location:</strong> {selectedProduct.location}</p>
+            </div>
+
+             <button
+              onClick={() => handleAddToTradeCart(selectedProduct)}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition"
+            >
+              Add to Trade Cart
+            </button>
           </div>
-        );
-      })()}
-
-      <div className="space-y-2 text-gray-700 mb-6">
-        <p><strong>Category:</strong> {selectedProduct.category}</p>
-        <p><strong>Price:</strong> {selectedProduct.price}</p>
-        <p><strong>Quantity:</strong> {selectedProduct.quantity}</p>
-        <p><strong>Description:</strong> {selectedProduct.description || 'No description available.'}</p>
-        <p><strong>Location:</strong> {selectedProduct.location}</p>
-      </div>
-
-      {/* Add to Trade Cart Button */}
-      <button
-        onClick={() => {
-          console.log("Added to Trade Cart:", selectedProduct);
-          // Later, call your context or API here
-          closeModal(); // optionally close modal
-        }}
-        className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition"
-      >
-        Add to Trade Cart
-      </button>
-    </div>
-  </div>
-  )}
+        </div>
+      )}
+       {/* Toast container */}
+      <ToastContainer position="top-center" autoClose={2000} />
     </div>
   );
 };

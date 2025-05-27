@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios'; // ✅ make sure axios is imported
+import axios from 'axios';
 
 export const CartContext = createContext();
 
@@ -9,81 +9,95 @@ export const CartProvider = ({ children }) => {
     return storedCart ? JSON.parse(storedCart) : [];
   });
 
-  // Sync cart to localStorage whenever it changes
+  const [tradeCartItems, setTradeCartItems] = useState(() => {
+    const storedTradeCart = localStorage.getItem('tradeCartItems');
+    return storedTradeCart ? JSON.parse(storedTradeCart) : [];
+  });
+
+  // Sync Buy Cart
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // ✅ Properly placed inside the component
+  // Sync Trade Cart
+  useEffect(() => {
+    localStorage.setItem('tradeCartItems', JSON.stringify(tradeCartItems));
+  }, [tradeCartItems]);
+
+  // BUY CART FUNCTIONS
   const refreshCart = async (userId) => {
     try {
       const res = await axios.get(`http://localhost:3000/api/tradecart/${userId}`);
-      setCartItems(res.data); // assumes the backend returns cart items
+      setCartItems(res.data);
     } catch (err) {
       console.error('Failed to refresh cart:', err);
     }
   };
 
   const addToCart = (item) => {
-    setCartItems(prevCartItems => {
-      const existing = prevCartItems.find(i => i.id === item.id);
-      if (existing) {
-        return prevCartItems.map(i =>
-          i.id === item.id
-            ? { ...i, quantity: i.quantity + item.quantity }
-            : i
-        );
-      } else {
-        return [...prevCartItems, item];
-      }
+    setCartItems(prev => {
+      const existing = prev.find(i => i.id === item.id);
+      return existing
+        ? prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i)
+        : [...prev, item];
     });
   };
 
-  const updateQuantity = (productId, quantity) => {
-    setCartItems(prevCartItems =>
-      prevCartItems.map(item =>
-        item.id === productId ? { ...item, quantity } : item
-      )
+  const updateQuantity = (id, quantity) => {
+    setCartItems(prev =>
+      prev.map(item => (item.id === id ? { ...item, quantity } : item))
     );
   };
 
-  const incrementQuantity = (productId) => {
-    setCartItems(prevCartItems =>
-      prevCartItems.map(item =>
-        item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
-      )
+  const incrementQuantity = (id) => {
+    setCartItems(prev =>
+      prev.map(item => (item.id === id ? { ...item, quantity: item.quantity + 1 } : item))
     );
   };
 
-  const decrementQuantity = (productId) => {
-    setCartItems(prevCartItems =>
-      prevCartItems.map(item =>
-        item.id === productId ? { ...item, quantity: item.quantity - 1 } : item
-      )
+  const decrementQuantity = (id) => {
+    setCartItems(prev =>
+      prev.map(item => (item.id === id ? { ...item, quantity: item.quantity - 1 } : item))
     );
   };
 
-  const removeFromCart = (productId) => {
-    setCartItems(prevCartItems =>
-      prevCartItems.filter(item => item.id !== productId)
+  const removeFromCart = (id) => {
+    setCartItems(prev => prev.filter(item => item.id !== id));
+  };
+
+  const clearCart = () => setCartItems([]);
+
+  const getTotalPrice = () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const getTotal = () => cartItems.reduce((total, item) => total + item.quantity, 0);
+
+  // TRADE CART FUNCTIONS
+  const addToTradeCart = (item) => {
+    setTradeCartItems(prev => {
+      const exists = prev.find(i => i.id === item.id);
+      return exists
+        ? prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i)
+        : [...prev, item];
+    });
+  };
+
+  const updateTradeQuantity = (id, quantity) => {
+    setTradeCartItems(prev =>
+      prev.map(item => (item.id === id ? { ...item, quantity } : item))
     );
   };
 
-  const clearCart = () => {
-    setCartItems([]);
+  const removeFromTradeCart = (id) => {
+    setTradeCartItems(prev => prev.filter(item => item.id !== id));
   };
 
-  const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-  };
+  const clearTradeCart = () => setTradeCartItems([]);
 
-  const getTotal = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
-  };
+  const getTradeTotalItems = () => tradeCartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <CartContext.Provider
       value={{
+        // BUY CART
         cartItems,
         addToCart,
         updateQuantity,
@@ -93,7 +107,15 @@ export const CartProvider = ({ children }) => {
         clearCart,
         getTotalPrice,
         getTotal,
-        refreshCart, // ✅ now correctly included
+        refreshCart,
+
+        // TRADE CART
+        tradeCartItems,
+        addToTradeCart,
+        updateTradeQuantity,
+        removeFromTradeCart,
+        clearTradeCart,
+        getTradeTotalItems,
       }}
     >
       {children}

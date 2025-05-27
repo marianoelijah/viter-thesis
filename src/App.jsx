@@ -44,6 +44,8 @@ import AddTrade from "./components/pages/frontend/Trades/AddTrade";
 import ProductList from "./components/pages/frontend/Trades/ProductList";
 import TradeList from "./components/pages/frontend/Trades/TradeList";
 import ProductUpload from "./components/pages/frontend/Trades/ProductUpload";
+import TradeCheckout from "./components/pages/frontend/Trades/TradeCheckout";
+import TradeConfirmation from "./components/pages/frontend/Trades/TradeConfirmation";
 
 const App = () => {
   const [cart, setCart] = useState([]);
@@ -65,7 +67,7 @@ const App = () => {
               <Route path="/donate" element={<Donate />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/cashout" element={<Cashout />} />
-              <Route path="/confirmation" element={<Confirmation />} />
+              
 
               {/* authentication */}
               <Route path="/login" element={<Login />} />
@@ -88,6 +90,8 @@ const App = () => {
               <Route path="/productlist" element={<ProductList />} />
               <Route path="/tradelist" element={<TradeList />} />
               <Route path="/product-upload" element={<ProductUpload />} />
+              <Route path="/trade-checkout" element={<TradeCheckout />} />
+              <Route path="/trade-confirmation" element={<TradeConfirmation />} />
 
               
               {/* seller-interface */}
