@@ -1,8 +1,10 @@
+import { useAuth } from '@/context/AuthContext';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const [form, setForm] = useState({ email: '', password: '' });
+  const { login } = useAuth();
+  const [form, setForm] = useState({ email: '', password: '', role: 'buyer' });
   const navigate = useNavigate();
   const [error, setError] = useState('');
 
@@ -23,7 +25,7 @@ const Login = () => {
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem('user', JSON.stringify(data));
+        login(data); // ✅ use context-aware login
         if (data.role === 'buyer') {
           navigate('/userinterface');
         } else if (data.role === 'seller') {

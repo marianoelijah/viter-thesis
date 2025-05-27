@@ -5,8 +5,8 @@ import App from './App.jsx';
 import './index.css';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { AuthContext } from './context/AuthContext'; // Adjust path if needed
-import { CartProvider } from '@/components/context/CartContext'; // Adjust path if needed
+import AuthContext, { AuthProvider } from './context/AuthContext'; 
+import { CartProvider } from '@/components/context/CartContext'; 
 import { TradeCartProvider } from './components/context/TradeCartContext.jsx';
 
 // Auth Context Wrapper
@@ -22,6 +22,7 @@ function AuthProviderWrapper({ children }) {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
+     <AuthProvider>
       <AuthProviderWrapper>
         <TradeCartProvider>
         <CartProvider>
@@ -30,6 +31,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </TradeCartProvider>
         <Toaster position="top-right" reverseOrder={false} />
       </AuthProviderWrapper>
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

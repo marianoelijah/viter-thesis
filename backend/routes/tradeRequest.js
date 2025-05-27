@@ -1,62 +1,29 @@
-// tradeRequests.routes.js (ES Module)
 import express from 'express';
 import db from '../config/db.js';
 
 const router = express.Router();
 
-// ✅ POST /api/trade-requests - Submit a trade request
-router.post('/', (req, res) => {
-  const {
-    requested_product_name,
-    requested_product_quantity,
-    offered_product_name,
-    offered_product_quantity,
-    user_id,
-    trade_id
-  } = req.body;
+router.post('/', async (req, res) => {
+  const { userId, items, offeredProducts, date } = req.body;
 
-  if (
-    !requested_product_name ||
-    !requested_product_quantity ||
-    !offered_product_name ||
-    !offered_product_quantity ||
-    !user_id ||
-    !trade_id
-  ) {
-    return res.status(400).json({ error: 'All fields are required.' });
+  try {
+    const sql = `
+      INSERT INTO trade_requests (user_id, items, offered_products, request_date)
+      VALUES (?, ?, ?, ?)
+    `;
+    await db.execute(sql, [
+      userId,
+      JSON.stringify(items),
+      JSON.stringify(offeredProducts),
+      date,
+    ]);
+
+    res.status(200).json({ message: 'Trade request submitted successfully!' });
+  } catch (err) {
+    console.error("Trade request error:", err);
+    res.status(500).json({ error: "Failed to save trade request" });
   }
-
-  const insertQuery = `
-    INSERT INTO trade_requests (
-      requested_product_name,
-      requested_product_quantity,
-      offered_product_name,
-      offered_product_quantity,
-      user_id,
-      trade_id
-    ) VALUES (?, ?, ?, ?, ?, ?)
-  `;
-
-  const values = [
-    requested_product_name,
-    requested_product_quantity,
-    offered_product_name,
-    offered_product_quantity,
-    user_id,
-    trade_id
-  ];
-
-  db.query(insertQuery, values, (err, result) => {
-    if (err) {
-      console.error('Error inserting trade request:', err);
-      return res.status(500).json({ error: 'Database error', detail: err.message });
-    }
-
-    res.status(201).json({
-      message: 'Trade request submitted successfully',
-      requestId: result.insertId
-    });
-  });
 });
+
 
 export default router;

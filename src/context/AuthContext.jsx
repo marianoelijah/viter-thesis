@@ -1,39 +1,32 @@
-import { createContext, useState, useEffect, useContext } from "react";
+// src/context/AuthContext.jsx
+import React, { createContext, useContext, useState } from 'react';
 
-// Create the authentication context
-export const AuthContext = createContext(null);
+const AuthContext = createContext();
 
-// Custom hook to use the AuthContext
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
-
-// AuthProvider component to manage authentication state
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
-  }, []);
-
+  // login function to set the user data in context
   const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+    // Normalize id field so it’s easier to access
+    setUser({
+      ...userData,
+      id: userData.userId || userData.id, 
+    });
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+// Custom hook for easier context usage
+export const useAuth = () => useContext(AuthContext);
+
+export default AuthContext;

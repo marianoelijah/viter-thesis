@@ -19,7 +19,7 @@ import requestRoutes from "./routes/requests.js";
 import inventoryRouter from './routes/inventory.js';
 import sellerProfileRoutes from "./routes/sellerProfile.js";
 import tradeRoutes from './routes/trade.js';
-import tradeRequestsRouter from './routes/tradeRequest.js';
+import tradeRequestRoute from './routes/tradeRequest.js';
 
 
 
@@ -99,7 +99,7 @@ app.use("/api/requests", requestRoutes);
 app.use('/api/inventory', inventoryRouter);
 app.use("/api/seller-profile", sellerProfileRoutes);
 app.use('/api/trades', tradeRoutes);
-app.use('/api/trade-requests', tradeRequestsRouter);
+app.use('/api/trade-requests', tradeRequestRoute);
 
 app.use((req, res) => {
   res.status(404).send(`❌ Route not found: ${req.originalUrl}`);
