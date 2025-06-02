@@ -46,6 +46,7 @@ import TradeList from "./components/pages/frontend/Trades/TradeList";
 import ProductUpload from "./components/pages/frontend/Trades/ProductUpload";
 import TradeCheckout from "./components/pages/frontend/Trades/TradeCheckout";
 import TradeConfirmation from "./components/pages/frontend/Trades/TradeConfirmation";
+import PurchaseHistory from "./components/pages/frontend/sellerinterface/PurchaseHistory";
 
 const App = () => {
   const [cart, setCart] = useState([]);
@@ -109,6 +110,8 @@ const App = () => {
               <Route path="/product-dashboard" element={<ProductDashboard />} />
               <Route path="/trade-product" element={<TradeOffers />} />
               <Route path="/seller/inventory" element={<Inventory cart={cart} setCart={setCart} />} />
+              <Route path="/purchase-history" element={<PurchaseHistory />} />
+              <Route path="/add-trade" element={<AddTrade />} />
             </Routes>
           </CartProvider>
         </StoreProvider>

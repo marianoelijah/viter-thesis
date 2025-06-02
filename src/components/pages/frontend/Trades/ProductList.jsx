@@ -13,18 +13,29 @@ const ProductList = () => {
   const { tradeCart, addToTradeCart } = useTradeCart();
 
 
-  const fetchProducts = async () => {
-    try {
-      const res = await axios.get("http://localhost:3000/api/trades");
-      setProducts(res.data);
-    } catch (err) {
-      console.error("Failed to fetch products", err);
-    }
-  };
+ const fetchProducts = async () => {
+  try {
+    const res = await axios.get("http://localhost:3000/api/trades2");
+    console.log("Fetched products res.data =", res.data);
 
-  useEffect(() => {
+    // Check and handle data format
+    const fetched = Array.isArray(res.data)
+      ? res.data
+      : Array.isArray(res.data.products)
+      ? res.data.products
+      : [];
+
+    setProducts(fetched);
+  } catch (err) {
+    console.error("❌ Failed to fetch products", err);
+    setProducts([]); // fallback to empty array
+  }
+};
+
+
+useEffect(() => {
     fetchProducts();
-  }, []);
+}, []);
 
   const openModal = (product) => {
     setSelectedProduct(product);
@@ -83,48 +94,44 @@ const ProductList = () => {
         </div>
       </div>
 
-      {/* Product Grid */}
-      {products.length === 0 ? (
-        <p className="text-center text-gray-500 text-lg">No products available.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {products.map((product, index) => {
-            let imageUrl = '';
-            try {
-              const images = JSON.parse(product.images);
-              if (images.length > 0) {
-                imageUrl = `http://localhost:3000/uploads/trades/${images[0]}`;
-              }
-            } catch (e) {
-              console.error("Error parsing images JSON", e);
-            }
+    {/* Product Grid */}
+{Array.isArray(products) && products.length > 0 ? (
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+    {products.map((product, index) => {
+      const imageUrl = product.images
+        ? `http://localhost:3000${product.images}` // already includes /uploads/...
+        : '';
 
-            return (
-              <div
-                key={index}
-                onClick={() => openModal(product)}
-                className="cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-xl hover:scale-[1.02] transition-transform duration-300 overflow-hidden border border-gray-200"
-              >
-                {imageUrl ? (
-                  <img
-                    src={imageUrl}
-                    alt={product.name}
-                    className="w-full h-48 object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">
-                    No Image
-                  </div>
-                )}
-                <div className="p-5">
-                  <h2 className="text-xl font-semibold text-gray-800 mb-1">{product.name}</h2>
-                  <p className="text-sm text-gray-500">{product.category}</p>
-                </div>
-              </div>
-            );
-          })}
+      return (
+        <div
+          key={index}
+          onClick={() => openModal(product)}
+          className="cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-xl hover:scale-[1.02] transition-transform duration-300 overflow-hidden border border-gray-200"
+        >
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={product.name}
+              className="w-full h-48 object-cover"
+            />
+          ) : (
+            <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">
+              No Image
+            </div>
+          )}
+          <div className="p-5">
+            <h2 className="text-xl font-semibold text-gray-800 mb-1">{product.name}</h2>
+            <p className="text-sm text-gray-500">{product.category}</p>
+          </div>
         </div>
-      )}
+      );
+    })}
+  </div>
+) : (
+  <p className="text-center text-gray-500 text-lg">No products available.</p>
+)}
+
+
 
       {/* Modal */}
       {selectedProduct && (
@@ -139,29 +146,24 @@ const ProductList = () => {
 
             <h2 className="text-2xl font-bold text-green-800 mb-4">{selectedProduct.name}</h2>
 
-            {(() => {
-              let imageUrl = '';
-              try {
-                const images = JSON.parse(selectedProduct.images);
-                if (images.length > 0) {
-                  imageUrl = `http://localhost:3000/uploads/trades/${images[0]}`;
-                }
-              } catch (e) {
-                console.error("Modal image parse error", e);
-              }
+          {(() => {
+  const imageUrl = selectedProduct.images
+    ? `http://localhost:3000${selectedProduct.images}`
+    : '';
 
-              return imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt={selectedProduct.name}
-                  className="w-full h-64 object-cover rounded mb-4"
-                />
-              ) : (
-                <div className="w-full h-64 bg-gray-200 rounded mb-4 flex items-center justify-center text-gray-500">
-                  No Image
-                </div>
-              );
-            })()}
+  return imageUrl ? (
+    <img
+      src={imageUrl}
+      alt={selectedProduct.name}
+      className="w-full h-64 object-cover rounded mb-4"
+    />
+  ) : (
+    <div className="w-full h-64 bg-gray-200 rounded mb-4 flex items-center justify-center text-gray-500">
+      No Image
+    </div>
+  );
+})()}
+
 
             <div className="space-y-2 text-gray-700 mb-6">
               <p><strong>Category:</strong> {selectedProduct.category}</p>
@@ -180,6 +182,8 @@ const ProductList = () => {
           </div>
         </div>
       )}
+
+      
        {/* Toast container */}
       <ToastContainer position="top-center" autoClose={2000} />
     </div>

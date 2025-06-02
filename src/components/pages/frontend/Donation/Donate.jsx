@@ -62,33 +62,31 @@ const Donate = () => {
 });
 
 
-  useEffect(() => {
-    fetch("http://localhost:3000/api/donations")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Fetched donations:", data);
+useEffect(() => {
+  fetch("http://localhost:3000/api/donation")
+    .then(async (res) => {
+      const text = await res.text(); // get raw response text
+      try {
+        const data = JSON.parse(text); // try to parse JSON
+        console.log("Fetched donation:", data);
         setDonations(data);
-      })
-      .catch((err) => {
-        console.error("Fetch donations failed:", err);
-      });
-  }, []);
+      } catch (err) {
+        console.error("Response is not JSON:", text);
+        throw err; // rethrow error to catch below
+      }
+    })
+    .catch((err) => {
+      console.error("Fetch donation failed:", err);
+    });
+}, []);
 
-//   useEffect(() => {
-//   fetch("http://localhost:3000/api/requests")
-//     .then((res) => res.json())
-//     .then((data) => {
-//       const approved = data.filter((r) => r.status === "Approved");
-//       setRequests(approved);
-//     });
-// }, []);
 
-    useEffect(() => {
-    if (!userId) return; // wait until userId is ready
+useEffect(() => {
+  if (!userId) return; // wait until userId is ready
 
     const fetchRequests = async () => {
       try {
-        const res = await axios.get(`/api/requests/user/${userId}`);
+        const res = await axios.get(`/api/donation/requests/user/${userId}`);
         setRequests(res.data);
 
         const approved = res.data.find(req => req.status === "Approved");
@@ -101,24 +99,33 @@ const Donate = () => {
       }
     };
 
-    fetchRequests();
-  }, [userId, navigate]);
+  fetchRequests();
+}, [userId, navigate]);
+
 
 const handleSubmit = async (e) => {
   e.preventDefault();
 
   if (!selectedDonation) return;
 
+  const donationId = selectedDonation?.donationId ?? selectedDonation?.id;
+  if (!donationId || !formData.name) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+
   const requestPayload = {
-    ...formData,
-    status: "Approved", 
-    donationId: selectedDonation.donationId,
-    productName: selectedDonation.productName,
-    quantity: selectedDonation.quantity,
+    donationId,
+    requesterName: formData.name,
+    email: formData.email,
+    message: formData.message,
+    status: "Pending", // or "Approved"
   };
 
+  console.log("Submitting:", requestPayload);
+
   try {
-    const response = await fetch("http://localhost:3000/api/requests", {
+    const response = await fetch("http://localhost:3000/api/donation/requests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestPayload),
@@ -130,7 +137,8 @@ const handleSubmit = async (e) => {
       setFormData({ name: "", email: "", message: "" });
       navigate("/donatetransaction");
     } else {
-      alert("Failed to submit request.");
+      const error = await response.json();
+      alert(error?.error || "Failed to submit request.");
     }
   } catch (error) {
     console.error("Error:", error);

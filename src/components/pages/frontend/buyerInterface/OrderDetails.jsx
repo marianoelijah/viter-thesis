@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -8,6 +8,7 @@ const OrderDetails = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -47,7 +48,7 @@ const OrderDetails = () => {
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-gray-700 mb-2">👤 Customer Info</h2>
           <div className="space-y-1 text-gray-600">
-            <p><strong>Name:</strong> {order.fullName}</p>
+           <p><strong>Name:</strong> {order?.full_name || "N/A"}</p>
             <p><strong>Email:</strong> {order.email}</p>
             <p><strong>Phone:</strong> {order.phone}</p>
             <p><strong>Address:</strong> {order.address}, {order.city}, {order.postalCode}</p>
@@ -61,9 +62,24 @@ const OrderDetails = () => {
             <p><strong>Subtotal:</strong> ₱{order.subtotal}</p>
             <p><strong>Tax:</strong> ₱{order.tax}</p>
             <p><strong>Total:</strong> ₱{order.total}</p>
-            <p><strong>Payment Method:</strong> {order.paymentMethod}</p>
+           <p><strong>Payment Method:</strong> {order?.payment_method || "N/A"}</p>
             <p><strong>Notes:</strong> {order.notes || 'N/A'}</p>
-            <p><strong>Placed On:</strong> {new Date(order.createdAt).toLocaleString()}</p>
+       <p>
+  <strong>Placed On:</strong>{" "}
+  {order?.created_at && !isNaN(new Date(order.created_at)) ? (
+    new Date(order.created_at).toLocaleString('en-PH', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    })
+  ) : (
+    "N/A"
+  )}
+</p>
+
           </div>
         </div>
 

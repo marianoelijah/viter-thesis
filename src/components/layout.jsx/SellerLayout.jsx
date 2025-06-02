@@ -11,6 +11,7 @@ function SellerLayout() {
     { path: "/seller/add-product", label: "Add Product" },
     { path: "/seller/edit-product/:id", label: "Edit Product" },
     { path: "/seller/my-products", label: "My Products" },
+    { path: "/purchase-history", label: "Purchase History" },
     { path: "/seller/inventory", label: "Inventory" },
     // { path: "/seller/manage-orders", label: "Manage Trade Orders" },
     { path: "/seller/donations", label: "Manage Donation" },

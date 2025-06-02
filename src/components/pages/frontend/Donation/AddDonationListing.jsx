@@ -42,7 +42,7 @@ function AddDonationListing() {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/donations", {
+      const res = await fetch("http://localhost:3000/api/donation", {
         method: "POST",
         body: formData,
       });

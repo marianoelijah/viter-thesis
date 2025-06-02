@@ -32,6 +32,17 @@ const BuyerPage = () => {
 
   const itemsPerPage = 10;
 
+  const formatDate = (date) => {
+  return new Date(date).toLocaleDateString("en-PH", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+
   // Fetch products
   const fetchProducts = async () => {
     try {
@@ -149,38 +160,28 @@ const filteredProducts = products.filter(product => {
 
   // Buy Now Handler (optional use, not in modal)
   const handleBuyNow = async (product) => {
-    const purchaseQuantity = quantities[product.id] || 1;
+  const purchaseQuantity = quantities[product.id] || 1;
 
-    if (product.availableStock < purchaseQuantity) {
-      toast.error("Not enough stock available.");
-      return;
-    }
+  if (product.availableStock < purchaseQuantity) {
+    toast.error("Not enough stock available.");
+    return;
+  }
 
-    try {
-      await axios.put(`http://localhost:3000/api/products/${product.id}/decrease-stock`, {
-        quantity: purchaseQuantity,
-      });
+  try {
+    const res = await axios.post("http://localhost:3000/api/purchase", {
+      productId: product.id,
+      quantity: purchaseQuantity,
+    });
 
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const existingItem = cart.find((item) => item.id === product.id);
+    toast.success(`${product.name} purchased for ₱${res.data.totalPrice}`);
+    fetchProducts(); // Refresh stock
+    navigate("/cart");
+  } catch (err) {
+    console.error("Purchase failed", err);
+    toast.error("Purchase error");
+  }
+};
 
-      if (existingItem) {
-        existingItem.quantity += purchaseQuantity;
-      } else {
-        cart.push({ ...product, quantity: purchaseQuantity });
-      }
-
-      localStorage.setItem("cart", JSON.stringify(cart));
-
-      fetchProducts();
-
-      toast.success(`${product.name} purchased!`);
-      navigate("/cart");
-    } catch (error) {
-      console.error("Purchase error:", error);
-      toast.error("Purchase failed.");
-    }
-  };
 
   // Dummy recommended logic (same category)
   const getRecommendedProducts = () => {
@@ -276,7 +277,7 @@ const filteredProducts = products.filter(product => {
               key={product.id}
               onClick={() => setModalProduct(product)}
               className="border rounded-lg p-4 shadow-md hover:shadow-lg transition bg-white"
-            >
+              >
               <img
                 src={`http://localhost:3000/uploads/${product.image}`}
                 alt={product.name}
@@ -288,6 +289,20 @@ const filteredProducts = products.filter(product => {
               <p className="text-gray-600 text-sm mt-2">{product.description}</p>
               <span className="text-green-600">In stock: {product.availableStock}</span>
               <p className="text-sm text-gray-500 mb-2 italic">Sold by: {getRandomShopName()}</p>
+               {/* 👇 New field for last purchased date */}
+             <p className="text-sm text-gray-500 italic">
+              Last purchased:{" "}
+              {product.last_purchased_at
+              ? new Date(product.last_purchased_at).toLocaleDateString("en-PH", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                })
+                : "Never"}
+              </p>
+
             </div>
           ))
         ) : (

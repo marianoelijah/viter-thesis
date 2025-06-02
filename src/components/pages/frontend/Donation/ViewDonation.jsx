@@ -17,7 +17,7 @@ const ViewDonations = () => {
 
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/donations")
+    fetch("http://localhost:3000/api/donation")
       .then((res) => res.json())
       .then((data) => {
         console.log("Fetched donations:", data);
@@ -29,7 +29,7 @@ const ViewDonations = () => {
   }, []);
 
   useEffect(() => {
-  fetch("http://localhost:3000/api/requests")
+  fetch("http://localhost:3000/api/donation/requests")
     .then((res) => res.json())
     .then((data) => {
       const approved = data.filter((r) => r.status === "Approved");
@@ -51,7 +51,7 @@ const handleSubmit = async (e) => {
   };
 
   try {
-    const response = await fetch("http://localhost:3000/api/requests", {
+    const response = await fetch("http://localhost:3000/api/donation/request", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestPayload),

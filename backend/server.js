@@ -3,23 +3,20 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import mysql from 'mysql2/promise';
-import multer from 'multer';
-import fs from 'fs';
 
 
 // Route imports
 import productsRoutes from './routes/products.js';
 import authRoutes from './routes/authRoutes.js';
-import donationsRoutes from './routes/donations.js';
+import tradeCartRoutes from './routes/tradeCart.js';
+import tradeRoutes from './routes/tradeRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
-// import tradeRouter from './routes/tradeRoutes.js';
-import tradeCartRoutes from './routes/tradeCart.js';
-import requestRoutes from "./routes/requests.js";
-import inventoryRouter from './routes/inventory.js';
-import sellerProfileRoutes from "./routes/sellerProfile.js";
-import tradeRoutes from './routes/trade.js';
-import tradeRequestRoute from './routes/tradeRequest.js';
+import orders2Routes from './routes/orders2.js';
+import purchaseRoutes from './routes/purchases.js';
+import tradesRoutes from './routes/trades.js';
+import trades2Routes from './routes/trades2.js';
+import donationRoutes from './routes/donationsRoutes.js';
 
 
 
@@ -38,6 +35,7 @@ const db = mysql.createPool({
 
 // Recommendation API from python
 import axios from 'axios'; // Correct for ES Modules
+
 async function getRecommendations(userEncoded) {
     try {
         const response = await axios.post('http://192.168.114.67:5000/recommend', {
@@ -58,25 +56,12 @@ getRecommendations(10);
 
 // Initialize express app
 const app = express();
+
 const PORT = process.env.PORT || 3000;
 
 // __dirname fix for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Multer setup for image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + '-' + file.originalname);
-  },
-});
-const upload = multer({ storage });
-
-
 
 // Middleware
 app.use(cors());  // Enable CORS
@@ -90,16 +75,19 @@ app.get('/', (req, res) => res.send('CORS is enabled!'));
 // Mount routers
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
-// app.use('/api/trade', tradeRouter);
-app.use('/api/donations', donationsRoutes);
+app.use('/api/tradecart', tradeCartRoutes);
+app.use('/api/trade', tradeRoutes);
+app.use('/api', tradeRoutes); // ✅ Mounts it correctly
 app.use('/api/orders2', orderRoutes);  // For checkout/order handling
 app.use(productRoutes); // For product handling
-app.use('/api/tradecart', tradeCartRoutes);
-app.use("/api/requests", requestRoutes); 
-app.use('/api/inventory', inventoryRouter);
-app.use("/api/seller-profile", sellerProfileRoutes);
-app.use('/api/trades', tradeRoutes);
-app.use('/api/trade-requests', tradeRequestRoute);
+app.use('/api/orders2', orders2Routes);
+app.use('/api/purchases', purchaseRoutes);
+app.use('/api/trades', tradesRoutes); 
+app.use('/api/trades2', trades2Routes);
+app.use('/api/donation', donationRoutes);
+
+
+
 
 app.use((req, res) => {
   res.status(404).send(`❌ Route not found: ${req.originalUrl}`);
@@ -109,4 +97,3 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
-

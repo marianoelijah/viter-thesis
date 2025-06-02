@@ -1,3 +1,4 @@
+// import axios from '../api/axiosInstance';
 import React, { useState, useEffect } from 'react'; // ✅ include useEffect
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -51,20 +52,78 @@ const Cashout = () => {
   }));
 }, [cartItems]);
 
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  try {
+    // POST to your backend route to save order + purchases
+    const response = await axios.post('http://localhost:3000/api/orders2', orderData);
 
+    alert('Order placed successfully!');
+    clearCart();  // Clear cart after order success
+    navigate(`/order/${response.data.orderId}`); // navigate to order confirmation page
+
+  } catch (err) {
+    console.error('Error placing order:', err);
+    alert('Failed to place order. Please try again.');
+  }
+};
+
+  const handleCheckout = async () => {
+  const payload = {
+    user_id: currentUser.id,
+    full_name,
+    email,
+    phone,
+    address,
+    payment_method,
+    subtotal,
+    tax,
+    total,
+    items: cartItems.map(item => ({
+      product_id: item.id,
+      quantity: item.quantity,
+      price: item.price
+    }))
+  };
+
+  try {
+    const res = await axios.post('/api/checkout', payload);
+    alert(res.data.message);
+  } catch (err) {
+    console.error(err);
+    alert("Checkout failed");
+  }
+};
+
+const handleSubmitOrder = async () => {
     try {
-      const response = await axios.post('http://localhost:3000/api/orders2', orderData); // Make sure this URL matches your backend
-      alert('Order placed successfully!');
-      console.log(orderData); // Replace with your actual variable
-      navigate(`/order/${response.data.orderId}`); // Correct navigation method
+      const orderData = {
+        ...form,
+        userId: user.id, // required
+        items: cartItems.map(item => ({
+          id: item.id,
+          product_name: item.product_name,
+          category: item.category,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        subtotal: getTotalPrice(),
+        tax: 0, // or calculate
+        total: getTotalPrice(), // subtotal + tax
+      };
+
+      const res = await axios.post('/orders2', orderData);
+      if (res.status === 201) {
+        clearCart();
+        navigate('/purchase-history');
+      }
     } catch (err) {
-      console.error('Error placing order:', err);
-      alert('Failed to place order. Please try again.');
+      console.error('Order error:', err);
+      alert('Failed to submit order');
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 flex justify-center items-center py-12">
